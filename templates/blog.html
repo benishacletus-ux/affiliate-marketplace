@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}Blog - Affiliate Marketing Tips & Strategies{% endblock %}
+
+{% block content %}
+<div class="blog-page">
+    <div class="blog-header">
+        <h1>Affiliate Marketing Blog</h1>
+        <p>Expert tips, strategies, and insights to grow your affiliate income</p>
+    </div>
+
+    <div class="blog-grid">
+        {% for post in posts.items %}
+        <article class="blog-card">
+            <!-- Blog Image -->
+            <div class="blog-card-image">
+                {% if post.image_file %}
+                    <img src="{{ url_for('static', filename='uploads/blog/' + post.image_file) }}" alt="{{ post.title }}" class="blog-featured-img">
+                {% elif post.image_url %}
+                    <img src="{{ post.image_url }}" alt="{{ post.title }}" class="blog-featured-img">
+                {% else %}
+                    <i class="{{ post.image_icon or 'fas fa-newspaper' }} fa-4x"></i>
+                {% endif %}
+            </div>
+            <div class="blog-card-content">
+                <div class="blog-category">
+                    <i class="fas fa-folder"></i> {{ post.category }}
+                </div>
+                <h2><a href="{{ url_for('blog_post', slug=post.slug) }}">{{ post.title }}</a></h2>
+                <p>{{ post.excerpt[:150] }}{% if post.excerpt|length > 150 %}...{% endif %}</p>
+                <div class="blog-card-meta">
+                    <span><i class="fas fa-user"></i> {{ post.author or 'Admin' }}</span>
+                    <span><i class="fas fa-calendar"></i> {{ post.created_at.strftime('%B %d, %Y') }}</span>
+                    <span><i class="fas fa-eye"></i> {{ post.views }} views</span>
+                    {% if post.tags %}
+                    <span><i class="fas fa-tags"></i> {{ post.tags.split(',')[:2]|join(', ') }}</span>
+                    {% endif %}
+                </div>
+                <a href="{{ url_for('blog_post', slug=post.slug) }}" class="read-more">Read More →</a>
+            </div>
+        </article>
+        {% else %}
+        <div class="no-posts">
+            <i class="fas fa-blog fa-4x"></i>
+            <h3>No Blog Posts Yet</h3>
+            <p>Check back soon for amazing content!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if posts.pages > 1 %}
+    <div class="pagination">
+        {% if posts.has_prev %}
+            <a href="{{ url_for('blog', page=posts.prev_num) }}" class="page-btn">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        {% endif %}
+        
+        <div class="page-numbers">
+            {% for page_num in posts.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                {% if page_num %}
+                    {% if page_num == posts.page %}
+                        <span class="page-btn active">{{ page_num }}</span>
+                    {% else %}
+                        <a href="{{ url_for('blog', page=page_num) }}" class="page-btn">{{ page_num }}</a>
+                    {% endif %}
+                {% else %}
+                    <span class="page-dots">...</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        {% if posts.has_next %}
+            <a href="{{ url_for('blog', page=posts.next_num) }}" class="page-btn">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.blog-page {
+    max-width: 1200px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+.blog-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.blog-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+}
+
+.blog-header p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.blog-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.blog-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    border-color: #1a1a1a;
+}
+
+.blog-card-image {
+    background: #f8f8f8;
+    padding: 30px;
+    text-align: center;
+    color: #1a1a1a;
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.blog-featured-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.blog-card-image i {
+    font-size: 4rem;
+    color: #1a1a1a;
+    opacity: 0.5;
+}
+
+.blog-card-content {
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.blog-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0f0f0;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+    width: fit-content;
+}
+
+.blog-card-content h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.blog-card-content h2 a {
+    color: #1a1a1a;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.blog-card-content h2 a:hover {
+    color: #666;
+}
+
+.blog-card-content p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    flex: 1;
+}
+
+.blog-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+    font-size: 0.8rem;
+    color: #888;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 15px;
+}
+
+.blog-card-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #f8f8f8;
+    width: fit-content;
+}
+
+.read-more:hover {
+    background: #1a1a1a;
+    color: white;
+    transform: translateX(5px);
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: #f8f8f8;
+    color: #1a1a1a;
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.page-btn:hover:not(.active) {
+    background: #1a1a1a;
+    color: white;
+    border-color: #1a1a1a;
+}
+
+.page-btn.active {
+    background: #1a1a1a;
+    color: white;
+    border-color: #1a1a1a;
+    cursor: default;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.page-dots {
+    padding: 0 8px;
+    color: #888;
+}
+
+.no-posts {
+    text-align: center;
+    padding: 60px;
+    color: #888;
+    grid-column: 1 / -1;
+}
+
+.no-posts i {
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+.no-posts h3 {
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .blog-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .blog-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .blog-header p {
+        font-size: 0.95rem;
+    }
+    
+    .blog-card-image {
+        min-height: 140px;
+        padding: 20px;
+    }
+    
+    .blog-featured-img {
+        height: 160px;
+    }
+    
+    .blog-card-content h2 {
+        font-size: 1.1rem;
+    }
+    
+    .blog-card-meta {
+        font-size: 0.7rem;
+        gap: 8px;
+    }
+    
+    .pagination {
+        gap: 8px;
+    }
+    
+    .page-btn {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Very Small Mobile */
+@media (max-width: 400px) {
+    .blog-card-meta {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .blog-card-image {
+        min-height: 100px;
+    }
+    
+    .blog-featured-img {
+        height: 120px;
+    }
+}
+</style>
+{% endblock %}

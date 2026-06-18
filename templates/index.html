@@ -1,0 +1,1042 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Banner - White Theme with Black Accents -->
+<div class="hero">
+    <div class="hero-content">
+        
+
+        <h1>Discover the <span class="highlight">best products</span> before you buy</h1>
+
+        <p>Explore carefully researched product reviews, expert recommendations, and exclusive deals to help you find
+            the right products at the best value.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('all_categories') }}" class="btn-primary">
+                <i class="fas fa-bolt"></i> Explore Products
+            </a>
+            <a href="{{ url_for('reviews_page') }}" class="btn-outline">
+                <i class="fas fa-star"></i> Read Reviews
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat"><span>{{ categories|length }}+</span> Categories</div>
+            <div class="stat"><span>100+</span> Products Reviewed</div>
+            <div class="stat"><span>✓</span> Trusted Recommendations</div>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Categories Section - Horizontal Scroll on Mobile -->
+<div class="section-head">
+    <h2>Browse Product Categories</h2>
+    <p>Explore trending niches</p>
+</div>
+
+<!-- Desktop Grid -->
+<div class="categories-grid desktop-only">
+    {% for cat in categories %}
+    <a href="{{ url_for('category', slug=cat.slug) }}" class="category-card">
+        <div class="category-icon"><i class="{{ cat.icon }}"></i></div>
+        <h4>{{ cat.name }}</h4>
+        <p>{{ cat.products|length }} products</p>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Mobile Horizontal Scroll -->
+<div class="categories-scroll-wrapper mobile-only">
+    <div class="categories-scroll-track">
+        {% for cat in categories %}
+        <a href="{{ url_for('category', slug=cat.slug) }}" class="category-card-horizontal">
+            <div class="category-icon-horizontal"><i class="{{ cat.icon }}"></i></div>
+            <h4>{{ cat.name[:12] }}</h4>
+            <p>{{ cat.products|length }} products</p>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ========== TRENDING PRODUCTS SECTION - WITH IMAGES ========== -->
+<div class="section-head" id="trending-products">
+    <h2>🔥 Top Recommended Products</h2>
+    <p>Popular products chosen by our visitors</p>
+</div>
+
+{% if trending_products and trending_products|length > 0 %}
+<div class="trending-container">
+    <div class="trending-track">
+        {% for product in trending_products %}
+        <a href="{{ url_for('product', slug=product.slug) }}" class="trending-product-card">
+            <div class="trending-product-img">
+                {% if product.image_file %}
+                <img src="{{ url_for('static', filename='uploads/products/' + product.image_file) }}"
+                    alt="{{ product.name }}" class="product-image">
+                {% elif product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                {% else %}
+                <i class="{{ product.image_icon }} fa-3x"></i>
+                {% endif %}
+            </div>
+            <div class="trending-product-info">
+                <h4>{{ product.name[:35] }}</h4>
+                <div class="trending-rating">
+                    {% set full_stars = product.rating|int %}
+                    {% set half_star = (product.rating - full_stars) >= 0.5 %}
+                    {% for i in range(full_stars) %}★{% endfor %}
+                    {% if half_star %}½{% endif %}
+                    {% for i in range(5 - full_stars - (1 if half_star else 0)) %}☆{% endfor %}
+                </div>
+                <div class="trending-price">₹{{ "%.2f"|format(product.price * 83) }}</div>
+                <div class="trending-btn">View Deal →</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="no-trending">
+    <i class="fas fa-fire"></i>
+    <h3>No trending products yet</h3>
+    <p>Mark products as trending in the admin panel to see them here.</p>
+</div>
+{% endif %}
+
+<!-- Blog Section - Horizontal Scroll on Mobile -->
+<div class="section-head">
+    <h2>Latest Buying Guides</h2>
+    <p>Expert tips, reviews, and product comparisons</p>
+</div>
+
+<!-- Desktop Grid -->
+<div class="blog-grid desktop-only">
+    {% for post in latest_blog %}
+    <a href="{{ url_for('blog_post', slug=post.slug) }}" class="blog-card">
+        <div class="blog-img"><i class="{{ post.image_icon }}"></i></div>
+        <div class="blog-content">
+            <div class="blog-category">{{ post.category }}</div>
+            <h4>{{ post.title[:40] }}</h4>
+            <p>{{ post.excerpt[:80] }}...</p>
+            <span class="read-more">Read more →</span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Mobile Horizontal Scroll -->
+<div class="blog-scroll-wrapper mobile-only">
+    <div class="blog-scroll-track">
+        {% for post in latest_blog %}
+        <a href="{{ url_for('blog_post', slug=post.slug) }}" class="blog-card-horizontal">
+            <div class="blog-img-horizontal"><i class="{{ post.image_icon }}"></i></div>
+            <div class="blog-content-horizontal">
+                <div class="blog-category-horizontal">{{ post.category }}</div>
+                <h4>{{ post.title[:35] }}</h4>
+                <p>{{ post.excerpt[:60] }}...</p>
+                <span class="read-more-horizontal">Read more →</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Reviews Auto-Scroll Carousel -->
+<div class="section-head">
+    <h2>Customer Feedback</h2>
+    <p>What our readers say about our recommendations</p>
+</div>
+
+<!-- Desktop Grid -->
+<div class="reviews-grid desktop-only">
+    {% for review in reviews %}
+    <div class="review-card">
+        <div class="review-stars">
+            {% for i in range(review.rating) %}★{% endfor %}
+            {% for i in range(5 - review.rating) %}☆{% endfor %}
+        </div>
+        <p class="review-text">"{{ review.comment[:120] }}"</p>
+        <div class="reviewer">
+            <div class="reviewer-avatar">{{ review.user_avatar }}</div>
+            <div class="reviewer-info">
+                <strong>{{ review.user_name }}</strong>
+                <span>Verified buyer</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Mobile Auto-Scrolling Reviews Carousel -->
+<div class="reviews-carousel-container mobile-only">
+    <div class="reviews-carousel-track">
+        {% for review in reviews %}
+        <div class="review-card-auto">
+            <div class="review-stars-auto">
+                {% for i in range(review.rating) %}★{% endfor %}
+                {% for i in range(5 - review.rating) %}☆{% endfor %}
+            </div>
+            <div class="review-text-auto">"{{ review.comment[:100] }}"</div>
+            <div class="reviewer-auto">
+                <div class="reviewer-avatar-auto">{{ review.user_avatar }}</div>
+                <div class="reviewer-name-auto">{{ review.user_name }}</div>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- Duplicate for seamless loop -->
+        {% for review in reviews %}
+        <div class="review-card-auto">
+            <div class="review-stars-auto">
+                {% for i in range(review.rating) %}★{% endfor %}
+                {% for i in range(5 - review.rating) %}☆{% endfor %}
+            </div>
+            <div class="review-text-auto">"{{ review.comment[:100] }}"</div>
+            <div class="reviewer-auto">
+                <div class="reviewer-avatar-auto">{{ review.user_avatar }}</div>
+                <div class="reviewer-name-auto">{{ review.user_name }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    /* ============================================
+   WHITE THEME - BLACK ACCENTS
+   Main: White | Side: Black/Dark Grey
+   ============================================ */
+
+    /* Base */
+    body {
+        background: #ffffff;
+        color: #1a1a1a;
+    }
+
+    /* Hero Section */
+    .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 60px;
+        padding: 60px 0 80px;
+        flex-wrap: wrap;
+    }
+
+    .hero-content {
+        flex: 1.2;
+    }
+
+    .hero-badge {
+        display: inline-block;
+        background: #f0f0f0;
+        padding: 6px 16px;
+        border-radius: 40px;
+        font-size: 0.7rem;
+        letter-spacing: 1.5px;
+        margin-bottom: 24px;
+        color: #333;
+    }
+
+    .hero-content h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        color: #1a1a1a;
+    }
+
+    .highlight {
+        color: #1a1a1a;
+        position: relative;
+        display: inline-block;
+    }
+
+    .highlight::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 30%;
+        background: rgba(0, 0, 0, 0.08);
+        z-index: -1;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 32px;
+        max-width: 480px;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+    }
+
+    .btn-primary,
+    .btn-outline {
+        padding: 12px 28px;
+        border-radius: 40px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background: #1a1a1a;
+        color: #ffffff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: #333333;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid #cccccc;
+        color: #333333;
+    }
+
+    .btn-outline:hover {
+        border-color: #1a1a1a;
+        background: rgba(0, 0, 0, 0.03);
+        transform: translateY(-2px);
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 48px;
+        flex-wrap: wrap;
+    }
+
+    .stat span {
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: block;
+        color: #1a1a1a;
+    }
+
+    .stat {
+        font-size: 0.8rem;
+        color: #888;
+    }
+
+    .hero-image {
+        flex: 1;
+        background: #f8f8f8;
+        border-radius: 32px;
+        padding: 48px;
+        text-align: center;
+        border: 1px solid #e0e0e0;
+    }
+
+    .hero-image i {
+        margin: 0 8px;
+        color: #1a1a1a;
+        opacity: 0.8;
+    }
+
+    .hero-image p {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    /* Section Headings */
+    .section-head {
+        text-align: center;
+        margin: 70px 0 40px;
+    }
+
+    .section-head h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #1a1a1a;
+    }
+
+    .section-head p {
+        color: #888;
+        font-size: 0.9rem;
+    }
+
+    /* Desktop Grid */
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 24px;
+        margin: 30px 0;
+    }
+
+    .category-card {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 24px;
+        padding: 32px 20px;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .category-card:hover {
+        border-color: #1a1a1a;
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .category-icon {
+        width: 70px;
+        height: 70px;
+        background: #f5f5f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+    }
+
+    .category-icon i {
+        font-size: 2rem;
+        color: #1a1a1a;
+    }
+
+    .category-card h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+    }
+
+    .category-card p {
+        font-size: 0.8rem;
+        color: #888;
+    }
+
+    .blog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
+        margin: 40px 0;
+    }
+
+    .blog-card {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 24px;
+        overflow: hidden;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .blog-card:hover {
+        border-color: #1a1a1a;
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .blog-img {
+        height: 180px;
+        background: #f8f8f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .blog-img i {
+        font-size: 2.8rem;
+        color: #1a1a1a;
+    }
+
+    .blog-content {
+        padding: 24px;
+    }
+
+    .blog-category {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #999;
+        margin-bottom: 8px;
+    }
+
+    .blog-content h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #1a1a1a;
+    }
+
+    .blog-content p {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 16px;
+        line-height: 1.5;
+    }
+
+    .read-more {
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #1a1a1a;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 28px;
+        margin: 40px 0 60px;
+    }
+
+    .review-card {
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        transition: all 0.25s ease;
+    }
+
+    .review-card:hover {
+        border-color: #1a1a1a;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .review-stars {
+        color: #f5a623;
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+        letter-spacing: 2px;
+    }
+
+    .review-text {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 20px;
+    }
+
+    .reviewer {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-top: 16px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .reviewer-avatar {
+        width: 44px;
+        height: 44px;
+        background: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .reviewer-info strong {
+        display: block;
+        font-size: 0.9rem;
+        color: #1a1a1a;
+    }
+
+    .reviewer-info span {
+        font-size: 0.7rem;
+        color: #999;
+    }
+
+    /* ============================================
+   TRENDING PRODUCTS SECTION - WITH IMAGES
+   ============================================ */
+
+    .trending-container {
+        overflow-x: auto;
+        overflow-y: visible;
+        padding-bottom: 20px;
+        margin: 20px 0 50px;
+        cursor: grab;
+        width: 100%;
+    }
+
+    .trending-container:active {
+        cursor: grabbing;
+    }
+
+    .trending-track {
+        display: flex;
+        gap: 24px;
+        width: fit-content;
+    }
+
+    .trending-product-card {
+        flex-shrink: 0;
+        width: 250px;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        padding: 16px;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        display: block;
+    }
+
+    .trending-product-card:hover {
+        transform: translateY(-5px);
+        border-color: #1a1a1a;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .trending-product-img {
+        height: 160px;
+        background: #f8f8f8;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .trending-product-img i {
+        font-size: 3rem;
+        color: #1a1a1a;
+    }
+
+    .trending-product-info h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+        line-height: 1.3;
+    }
+
+    .trending-rating {
+        color: #f5a623;
+        font-size: 0.7rem;
+        margin: 8px 0;
+        letter-spacing: 1px;
+    }
+
+    .trending-price {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 8px 0;
+    }
+
+    .trending-btn {
+        background: #1a1a1a;
+        color: #ffffff;
+        padding: 8px 12px;
+        border-radius: 40px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.7rem;
+        transition: all 0.2s;
+        margin-top: 10px;
+    }
+
+    .trending-product-card:hover .trending-btn {
+        background: #333333;
+    }
+
+    .no-trending {
+        text-align: center;
+        padding: 60px 20px;
+        background: #f8f8f8;
+        border-radius: 20px;
+        margin: 30px 0;
+    }
+
+    .no-trending i {
+        font-size: 3rem;
+        color: #888;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .no-trending h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        color: #1a1a1a;
+    }
+
+    .no-trending p {
+        color: #666;
+    }
+
+    /* Scrollbar Styling */
+    .trending-container::-webkit-scrollbar {
+        height: 5px;
+    }
+
+    .trending-container::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+
+    .trending-container::-webkit-scrollbar-thumb {
+        background: #1a1a1a;
+        border-radius: 10px;
+    }
+
+    /* Horizontal Scroll for Mobile */
+    .categories-scroll-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        margin: 0 -20px;
+        padding: 0 20px 20px;
+        display: none;
+    }
+
+    .categories-scroll-track {
+        display: flex;
+        gap: 16px;
+        width: fit-content;
+    }
+
+    .category-card-horizontal {
+        flex-shrink: 0;
+        width: 130px;
+        scroll-snap-align: start;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        padding: 16px 12px;
+        text-align: center;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .category-card-horizontal:hover {
+        transform: translateY(-3px);
+        border-color: #1a1a1a;
+    }
+
+    .category-icon-horizontal {
+        width: 55px;
+        height: 55px;
+        background: #f8f8f8;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+    }
+
+    .category-icon-horizontal i {
+        font-size: 1.6rem;
+        color: #1a1a1a;
+    }
+
+    .category-card-horizontal h4 {
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #1a1a1a;
+    }
+
+    .category-card-horizontal p {
+        font-size: 0.65rem;
+        color: #888888;
+    }
+
+    /* Blog Horizontal Scroll */
+    .blog-scroll-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        margin: 0 -20px;
+        padding: 0 20px 20px;
+        display: none;
+    }
+
+    .blog-scroll-track {
+        display: flex;
+        gap: 20px;
+        width: fit-content;
+    }
+
+    .blog-card-horizontal {
+        flex-shrink: 0;
+        width: 270px;
+        scroll-snap-align: start;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        overflow: hidden;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .blog-card-horizontal:hover {
+        transform: translateY(-3px);
+        border-color: #1a1a1a;
+    }
+
+    .blog-img-horizontal {
+        height: 130px;
+        background: #f8f8f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .blog-img-horizontal i {
+        font-size: 2.2rem;
+        color: #1a1a1a;
+    }
+
+    .blog-content-horizontal {
+        padding: 14px;
+    }
+
+    .blog-category-horizontal {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #888888;
+        margin-bottom: 6px;
+    }
+
+    .blog-content-horizontal h4 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #1a1a1a;
+        line-height: 1.3;
+    }
+
+    .blog-content-horizontal p {
+        font-size: 0.7rem;
+        color: #666666;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .read-more-horizontal {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Reviews Auto-Scroll Carousel */
+    .reviews-carousel-container {
+        position: relative;
+        overflow: hidden;
+        margin: 30px 0;
+        display: none;
+    }
+
+    .reviews-carousel-track {
+        display: flex;
+        gap: 20px;
+        animation: scrollReviews 35s linear infinite;
+        width: fit-content;
+    }
+
+    .reviews-carousel-container:hover .reviews-carousel-track {
+        animation-play-state: paused;
+    }
+
+    @keyframes scrollReviews {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(calc(-50% - 10px));
+        }
+    }
+
+    .review-card-auto {
+        flex-shrink: 0;
+        width: 280px;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        padding: 18px;
+        transition: 0.2s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .review-card-auto:hover {
+        border-color: #1a1a1a;
+        transform: translateY(-3px);
+    }
+
+    .review-stars-auto {
+        color: #f5a623;
+        font-size: 0.75rem;
+        margin-bottom: 10px;
+        letter-spacing: 2px;
+    }
+
+    .review-text-auto {
+        font-size: 0.8rem;
+        line-height: 1.5;
+        color: #555555;
+        margin-bottom: 14px;
+    }
+
+    .reviewer-auto {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-top: 10px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .reviewer-avatar-auto {
+        width: 35px;
+        height: 35px;
+        background: #1a1a1a;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: white;
+    }
+
+    .reviewer-name-auto {
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #1a1a1a;
+    }
+
+    /* Responsive - Show/Hide based on screen size */
+    @media (min-width: 769px) {
+        .mobile-only {
+            display: none !important;
+        }
+
+        .desktop-only {
+            display: grid;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .desktop-only {
+            display: none !important;
+        }
+
+        .mobile-only {
+            display: block;
+        }
+
+        .categories-scroll-wrapper {
+            display: block;
+        }
+
+        .blog-scroll-wrapper {
+            display: block;
+        }
+
+        .reviews-carousel-container {
+            display: block;
+        }
+
+        .hero {
+            flex-direction: column;
+            text-align: center;
+            gap: 40px;
+        }
+
+        .hero-content h1 {
+            font-size: 2.2rem;
+        }
+
+        .hero-buttons {
+            justify-content: center;
+        }
+
+        .hero-stats {
+            justify-content: center;
+        }
+
+        .trending-product-card {
+            width: 200px;
+            padding: 12px;
+        }
+
+        .trending-product-img {
+            height: 120px;
+        }
+
+        .category-card-horizontal {
+            width: 115px;
+            padding: 12px 8px;
+        }
+
+        .category-icon-horizontal {
+            width: 48px;
+            height: 48px;
+        }
+
+        .category-icon-horizontal i {
+            font-size: 1.4rem;
+        }
+
+        .blog-card-horizontal {
+            width: 250px;
+        }
+
+        .review-card-auto {
+            width: 260px;
+            padding: 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .trending-product-card {
+            width: 180px;
+        }
+
+        .category-card-horizontal {
+            width: 100px;
+        }
+
+        .blog-card-horizontal {
+            width: 230px;
+        }
+
+        .review-card-auto {
+            width: 240px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+
+
+

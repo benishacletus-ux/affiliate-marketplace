@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}All Categories - Affiliate Marketplace{% endblock %}
+
+{% block content %}
+<div class="categories-page-header">
+    <h1><i class="fas fa-th-large"></i> All Categories</h1>
+    <p>Browse products by category and find the best affiliate deals</p>
+</div>
+
+<div class="all-categories-grid">
+    {% for item in categories %}
+    <a href="{{ url_for('category', slug=item.category.slug) }}" class="category-card-large">
+        <div class="category-card-icon">
+            <i class="{{ item.category.icon }} fa-3x"></i>
+        </div>
+        <div class="category-card-info">
+            <h3>{{ item.category.name }}</h3>
+            <p>{{ item.category.description[:80] }}{% if item.category.description and item.category.description|length > 80 %}...{% endif %}</p>
+            <div class="category-stats">
+                <span><i class="fas fa-box"></i> {{ item.product_count }} products</span>
+                <span class="explore-link">Explore <i class="fas fa-arrow-right"></i></span>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<style>
+/* ============================================
+   ALL CATEGORIES PAGE - WHITE THEME / BLACK ACCENTS
+   ============================================ */
+
+.categories-page-header {
+    text-align: center;
+    margin: 40px 0 50px;
+}
+
+.categories-page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #1a1a1a;
+}
+
+.categories-page-header p {
+    font-size: 1.1rem;
+    color: #888888;
+}
+
+.all-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+    margin: 30px 0 60px;
+}
+
+.category-card-large {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 25px;
+    border-radius: 24px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.category-card-large:hover {
+    transform: translateY(-5px);
+    border-color: #1a1a1a;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.category-card-icon {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    flex-shrink: 0;
+    background: #f8f8f8;
+    transition: 0.2s;
+}
+
+.category-card-large:hover .category-card-icon {
+    background: #1a1a1a;
+}
+
+.category-card-icon i {
+    font-size: 2.5rem;
+    color: #1a1a1a;
+    transition: 0.2s;
+}
+
+.category-card-large:hover .category-card-icon i {
+    color: #ffffff;
+}
+
+.category-card-info {
+    flex: 1;
+}
+
+.category-card-info h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+}
+
+.category-card-info p {
+    font-size: 0.85rem;
+    color: #666666;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.category-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: #888888;
+}
+
+.explore-link {
+    font-weight: 600;
+    transition: gap 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #1a1a1a;
+}
+
+.category-card-large:hover .explore-link {
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .categories-page-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .all-categories-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .category-card-large {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .category-stats {
+        justify-content: center;
+        gap: 20px;
+    }
+}
+</style>
+{% endblock %}
+
+
+
+
+

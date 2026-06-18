@@ -1,0 +1,1117 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} - ABBEN HUB{% endblock %}
+
+{% block content %}
+<div class="blog-post-container">
+    <!-- Back Button -->
+    <div class="back-button">
+        <a href="{{ url_for('blog') }}" class="btn-outline">
+            <i class="fas fa-arrow-left"></i> Back to Blog
+        </a>
+    </div>
+
+    <!-- Blog Post Header -->
+    <div class="blog-post-header">
+        <div class="blog-post-category">
+            <span class="category-tag"><i class="fas fa-tag"></i> {{ post.category }}</span>
+        </div>
+        <h1 class="blog-post-title">{{ post.title }}</h1>
+        
+        <div class="blog-post-meta">
+            <div class="meta-item">
+                <i class="fas fa-user-circle"></i> 
+                <span>{{ post.author or 'Admin' }}</span>
+            </div>
+            <div class="meta-item">
+                <i class="fas fa-calendar-alt"></i> 
+                <span>{{ post.created_at.strftime('%B %d, %Y') if post.created_at else 'June 2026' }}</span>
+            </div>
+            <div class="meta-item">
+                <i class="fas fa-clock"></i> 
+                <span>{{ post.read_time if post.read_time else '5 min read' }}</span>
+            </div>
+            <div class="meta-item">
+                <i class="fas fa-eye"></i> 
+                <span>{{ post.views }} views</span>
+            </div>
+        </div>
+        
+        <!-- Featured Image -->
+        <div class="blog-featured-image">
+            {% if post.image_file %}
+                <img src="{{ url_for('static', filename='uploads/blog/' + post.image_file) }}" alt="{{ post.title }}" class="featured-img">
+            {% elif post.image_url %}
+                <img src="{{ post.image_url }}" alt="{{ post.title }}" class="featured-img">
+            {% else %}
+                <div class="blog-post-icon">
+                    <i class="{{ post.image_icon if post.image_icon else 'fas fa-file-alt' }} fa-3x"></i>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Blog Post Content -->
+    <div class="blog-post-content">
+        {{ post.content | safe }}
+        
+        <!-- Tags -->
+        {% if post.tags %}
+        <div class="post-tags">
+            <span class="tags-label"><i class="fas fa-tags"></i> Tags:</span>
+            {% for tag in post.get_tags_list() %}
+                <a href="{{ url_for('blog_by_tag', tag=tag) }}" class="tag-link">#{{ tag }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Affiliate Disclosure -->
+        <div class="affiliate-disclosure">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>Affiliate Disclosure:</strong> This post may contain affiliate links. If you purchase through these links, we may earn a commission at no extra cost to you.
+            </div>
+        </div>
+        
+        <!-- Share Buttons -->
+        <div class="share-buttons">
+            <h4>Share this post:</h4>
+            <div class="share-icons">
+                <a href="https://twitter.com/intent/tweet?url={{ request.url if request else '#' }}&text={{ post.title }}" 
+                   target="_blank" rel="noopener noreferrer" class="share-btn twitter" aria-label="Share on X">
+                    <i class="fab fa-x-twitter"></i>
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url if request else '#' }}" 
+                   target="_blank" rel="noopener noreferrer" class="share-btn facebook" aria-label="Share on Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.url if request else '#' }}" 
+                   target="_blank" rel="noopener noreferrer" class="share-btn linkedin" aria-label="Share on LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://pinterest.com/pin/create/button/?url={{ request.url if request else '#' }}&description={{ post.title }}" 
+                   target="_blank" rel="noopener noreferrer" class="share-btn pinterest" aria-label="Share on Pinterest">
+                    <i class="fab fa-pinterest-p"></i>
+                </a>
+                <a href="mailto:?subject={{ post.title }}&body=Check out this article: {{ request.url if request else '#' }}" 
+                   class="share-btn email" aria-label="Share via Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Author Bio Section -->
+    <div class="author-bio">
+        <div class="author-avatar">
+            <i class="fas fa-user-circle fa-3x"></i>
+        </div>
+        <div class="author-info">
+            <h3>About {{ post.author or 'Admin' }}</h3>
+            <p>{{ post.author or 'Admin' }} is an affiliate marketing expert with over 5 years of experience helping creators monetize their content. Passionate about sharing honest reviews and actionable strategies.</p>
+        </div>
+    </div>
+
+    <!-- Related Posts Section -->
+    {% if related_posts %}
+    <div class="related-posts">
+        <div class="section-head">
+            <h2><i class="fas fa-newspaper"></i> You Might Also Like</h2>
+            <p>Continue reading these related articles</p>
+        </div>
+        <div class="related-grid">
+            {% for related in related_posts %}
+            <a href="{{ url_for('blog_post', slug=related.slug) }}" class="related-post-card">
+                <div class="related-post-img">
+                    {% if related.image_file %}
+                        <img src="{{ url_for('static', filename='uploads/blog/' + related.image_file) }}" alt="{{ related.title }}" class="related-img">
+                    {% elif related.image_url %}
+                        <img src="{{ related.image_url }}" alt="{{ related.title }}" class="related-img">
+                    {% else %}
+                        <i class="{{ related.image_icon if related.image_icon else 'fas fa-file-alt' }} fa-2x"></i>
+                    {% endif %}
+                </div>
+                <div class="related-post-info">
+                    <div class="related-category">{{ related.category }}</div>
+                    <h4>{{ related.title[:60] }}{% if related.title|length > 60 %}...{% endif %}</h4>
+                    <p class="related-meta">
+                        <i class="fas fa-calendar-alt"></i> {{ related.created_at.strftime('%b %d, %Y') if related.created_at else '' }}
+                    </p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <div class="section-head">
+            <h2><i class="fas fa-comments"></i> Comments</h2>
+            <p>Join the conversation</p>
+        </div>
+        
+        <!-- Comment Form -->
+        <div class="comment-form-container">
+            <h3>Leave a Comment</h3>
+            <form id="commentForm" class="comment-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" id="commentName" placeholder="Your Name *" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="commentEmail" placeholder="Your Email *" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <textarea id="commentText" rows="4" placeholder="Write your comment here... *" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Post Comment <i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
+        
+        <!-- Comments List -->
+        <div class="comments-list" id="commentsList">
+            <div class="comment-card">
+                <div class="comment-avatar">JD</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <strong>Jessica Davis</strong>
+                        <span class="comment-date">June 4, 2026</span>
+                    </div>
+                    <p>This is such a helpful article! I've been looking for ways to improve my affiliate marketing strategy. Thanks for sharing these insights!</p>
+                    <button class="reply-btn">Reply</button>
+                </div>
+            </div>
+            <div class="comment-card">
+                <div class="comment-avatar">MK</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <strong>Michael Kim</strong>
+                        <span class="comment-date">June 3, 2026</span>
+                    </div>
+                    <p>Really enjoyed reading this. Do you have any recommendations for beginners starting with affiliate marketing?</p>
+                    <button class="reply-btn">Reply</button>
+                </div>
+            </div>
+        </div>
+        
+        <button class="load-more-btn btn-outline">Load More Comments <i class="fas fa-chevron-down"></i></button>
+    </div>
+</div>
+
+<style>
+/* ============================================
+   BLOG POST PAGE - COMPLETE CSS
+   ============================================ */
+
+/* ---------- BLOG POST CONTAINER ---------- */
+.blog-post-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 0 60px;
+}
+
+/* ---------- BACK BUTTON ---------- */
+.back-button {
+    margin-bottom: 30px;
+}
+
+.back-button .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 40px;
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.back-button .btn-outline:hover {
+    border-color: #1a1a1a;
+    background: rgba(0,0,0,0.02);
+    transform: translateX(-3px);
+}
+
+/* ---------- BLOG POST HEADER ---------- */
+.blog-post-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.blog-post-category {
+    margin-bottom: 20px;
+}
+
+.category-tag {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: #f0f0f0;
+    color: #1a1a1a;
+}
+
+.blog-post-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.2;
+    color: #1a1a1a;
+}
+
+.blog-post-meta {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    color: #888888;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.meta-item i {
+    color: #1a1a1a;
+    opacity: 0.6;
+}
+
+/* ---------- FEATURED IMAGE ---------- */
+.blog-featured-image {
+    margin: 20px 0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.featured-img {
+    width: 100%;
+    max-height: 450px;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.blog-post-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    background: #f8f8f8;
+    border: 1px solid #e0e0e0;
+}
+
+.blog-post-icon i {
+    color: #1a1a1a;
+}
+
+/* ---------- BLOG POST CONTENT ---------- */
+.blog-post-content {
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin-bottom: 40px;
+    color: #333333;
+}
+
+.blog-post-content p {
+    margin-bottom: 20px;
+    color: #444444;
+}
+
+.blog-post-content h2 {
+    font-size: 1.6rem;
+    margin: 30px 0 15px;
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+.blog-post-content h3 {
+    font-size: 1.3rem;
+    margin: 25px 0 12px;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.blog-post-content h4 {
+    font-size: 1.1rem;
+    margin: 20px 0 10px;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.blog-post-content ul, 
+.blog-post-content ol {
+    margin: 15px 0 15px 25px;
+}
+
+.blog-post-content li {
+    margin: 8px 0;
+    color: #555555;
+}
+
+.blog-post-content img {
+    max-width: 100%;
+    border-radius: 16px;
+    margin: 20px 0;
+}
+
+.blog-post-content blockquote {
+    padding: 20px 30px;
+    border-left: 4px solid #1a1a1a;
+    margin: 25px 0;
+    font-style: italic;
+    border-radius: 12px;
+    background: #f8f8f8;
+    color: #333333;
+}
+
+.blog-post-content code {
+    background: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #1a1a1a;
+}
+
+.blog-post-content pre {
+    background: #f0f0f0;
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+/* ---------- POST TAGS ---------- */
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 30px 0 20px;
+    padding: 15px 0;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tags-label {
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tag-link {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #f0f0f0;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #1a1a1a;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.tag-link:hover {
+    background: #1a1a1a;
+    color: white;
+}
+
+/* ---------- AFFILIATE DISCLOSURE ---------- */
+.affiliate-disclosure {
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    margin: 30px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    color: #555555;
+}
+
+.affiliate-disclosure i {
+    color: #1a1a1a;
+    font-size: 1.2rem;
+    margin-top: 2px;
+}
+
+/* ---------- SHARE BUTTONS ---------- */
+.share-buttons {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.share-buttons h4 {
+    margin-bottom: 15px;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.share-icons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    background: #f0f0f0;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+}
+
+.share-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.share-btn.twitter:hover { 
+    background: #000000; 
+    color: white; 
+    border-color: #000000;
+}
+
+.share-btn.facebook:hover { 
+    background: #4267B2; 
+    color: white; 
+    border-color: #4267B2;
+}
+
+.share-btn.linkedin:hover { 
+    background: #0077B5; 
+    color: white; 
+    border-color: #0077B5;
+}
+
+.share-btn.pinterest:hover { 
+    background: #E60023; 
+    color: white; 
+    border-color: #E60023;
+}
+
+.share-btn.email:hover { 
+    background: #ea580c; 
+    color: white; 
+    border-color: #ea580c;
+}
+
+/* ---------- AUTHOR BIO ---------- */
+.author-bio {
+    display: flex;
+    gap: 25px;
+    padding: 30px;
+    border-radius: 24px;
+    margin: 40px 0;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.author-avatar {
+    flex-shrink: 0;
+    color: #1a1a1a;
+}
+
+.author-avatar i {
+    color: #1a1a1a;
+}
+
+.author-info h3 {
+    margin-bottom: 10px;
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+.author-info p {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    color: #666666;
+}
+
+/* ---------- RELATED POSTS ---------- */
+.related-posts {
+    margin: 50px 0;
+}
+
+.section-head {
+    text-align: center;
+    margin: 40px 0 30px;
+}
+
+.section-head h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.section-head p {
+    color: #888888;
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.related-post-card {
+    border-radius: 20px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.related-post-card:hover {
+    transform: translateY(-5px);
+    border-color: #1a1a1a;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.related-post-img {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #f8f8f8;
+}
+
+.related-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.related-post-img i {
+    color: #1a1a1a;
+    opacity: 0.5;
+}
+
+.related-category {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.related-post-info {
+    padding: 16px;
+}
+
+.related-post-info h4 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.related-meta {
+    font-size: 0.75rem;
+    color: #888888;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ---------- COMMENTS SECTION ---------- */
+.comments-section {
+    margin-top: 50px;
+}
+
+.comment-form-container {
+    margin-bottom: 40px;
+    padding: 25px;
+    border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.comment-form-container h3 {
+    margin-bottom: 20px;
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+.comment-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    color: #1a1a1a;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(26,26,26,0.05);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #aaaaaa;
+}
+
+.comment-form .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 30px;
+    border-radius: 40px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: #1a1a1a;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+}
+
+.comment-form .btn-primary:hover {
+    background: #333333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ---------- COMMENTS LIST ---------- */
+.comments-list {
+    margin: 30px 0;
+}
+
+.comment-card {
+    display: flex;
+    gap: 15px;
+    padding: 20px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    background: #f8f8f8;
+    transition: all 0.3s ease;
+}
+
+.comment-card:hover {
+    background: #f0f0f0;
+}
+
+.comment-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+    background: #1a1a1a;
+    color: #ffffff;
+    font-size: 1.1rem;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.comment-header strong {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.comment-date {
+    font-size: 0.75rem;
+    color: #888888;
+}
+
+.comment-content p {
+    color: #555555;
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.reply-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-top: 10px;
+    font-weight: 600;
+    color: #1a1a1a;
+    transition: all 0.3s ease;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.reply-btn:hover {
+    background: #1a1a1a;
+    color: white;
+}
+
+/* ---------- LOAD MORE BUTTON ---------- */
+.load-more-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 30px;
+    border-radius: 40px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+    color: #1a1a1a;
+    background: transparent;
+    cursor: pointer;
+}
+
+.load-more-btn:hover {
+    border-color: #1a1a1a;
+    background: rgba(0,0,0,0.02);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .blog-post-container {
+        padding: 20px 20px 60px;
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-post-container {
+        padding: 0 16px 40px;
+    }
+    
+    .blog-post-title {
+        font-size: 1.8rem;
+    }
+    
+    .blog-post-meta {
+        gap: 12px;
+        font-size: 0.8rem;
+    }
+    
+    .meta-item {
+        font-size: 0.8rem;
+    }
+    
+    .comment-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .author-bio {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .author-avatar {
+        margin: 0 auto;
+    }
+    
+    .share-icons {
+        gap: 10px;
+    }
+    
+    .share-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 0.85rem;
+    }
+    
+    .related-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .blog-post-content {
+        font-size: 0.95rem;
+    }
+    
+    .blog-post-content h2 {
+        font-size: 1.3rem;
+    }
+    
+    .blog-post-content h3 {
+        font-size: 1.1rem;
+    }
+    
+    .comment-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .section-head h2 {
+        font-size: 1.4rem;
+    }
+    
+    .featured-img {
+        max-height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-post-title {
+        font-size: 1.5rem;
+    }
+    
+    .blog-post-icon {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .blog-post-icon i {
+        font-size: 2rem !important;
+    }
+    
+    .category-tag {
+        font-size: 0.7rem;
+        padding: 4px 12px;
+    }
+    
+    .affiliate-disclosure {
+        flex-direction: column;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .affiliate-disclosure i {
+        margin: 0 auto;
+    }
+    
+    .comment-form-container {
+        padding: 15px;
+    }
+    
+    .comment-card {
+        padding: 15px;
+    }
+    
+    .post-tags {
+        gap: 5px;
+    }
+    
+    .tag-link {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+    }
+}
+
+/* ---------- PRINT STYLES ---------- */
+@media print {
+    .back-button,
+    .share-buttons,
+    .related-posts,
+    .comments-section,
+    .author-social {
+        display: none !important;
+    }
+    
+    .blog-post-container {
+        padding: 0;
+        max-width: 100%;
+    }
+    
+    .blog-post-content {
+        font-size: 12pt;
+        line-height: 1.6;
+    }
+    
+    .affiliate-disclosure {
+        border: 1px solid #ccc;
+        background: #f9f9f9;
+    }
+}
+</style>
+
+<script>
+// ============================================
+// BLOG POST PAGE JAVASCRIPT
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ---------- Comment Form Submission ----------
+    const commentForm = document.getElementById('commentForm');
+    if (commentForm) {
+        commentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('commentName');
+            const email = document.getElementById('commentEmail');
+            const commentText = document.getElementById('commentText');
+            
+            // Validate
+            if (!name.value.trim() || !commentText.value.trim()) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Add new comment to list
+            const commentsList = document.getElementById('commentsList');
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-card';
+            newComment.style.animation = 'fadeIn 0.5s ease';
+            newComment.innerHTML = `
+                <div class="comment-avatar">${name.value.charAt(0).toUpperCase()}</div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <strong>${name.value}</strong>
+                        <span class="comment-date">Just now</span>
+                    </div>
+                    <p>${commentText.value}</p>
+                    <button class="reply-btn">Reply</button>
+                </div>
+            `;
+            commentsList.insertBefore(newComment, commentsList.firstChild);
+            
+            // Add reply functionality to new button
+            newComment.querySelector('.reply-btn').addEventListener('click', function() {
+                const commentContent = this.closest('.comment-content');
+                const authorName = commentContent.querySelector('.comment-header strong').textContent;
+                const commentTextarea = document.getElementById('commentText');
+                if (commentTextarea) {
+                    commentTextarea.value = `@${authorName} `;
+                    commentTextarea.focus();
+                }
+            });
+            
+            // Reset form
+            commentForm.reset();
+            
+            // Show success message
+            alert('✅ Comment posted successfully!');
+        });
+    }
+    
+    // ---------- Reply Button Functionality ----------
+    document.querySelectorAll('.reply-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const commentContent = this.closest('.comment-content');
+            const authorName = commentContent.querySelector('.comment-header strong').textContent;
+            
+            const commentTextarea = document.getElementById('commentText');
+            if (commentTextarea) {
+                commentTextarea.value = `@${authorName} `;
+                commentTextarea.focus();
+            }
+        });
+    });
+    
+    // ---------- Load More Comments ----------
+    const loadMoreBtn = document.querySelector('.load-more-btn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function() {
+            const loadingSpinner = document.createElement('div');
+            loadingSpinner.className = 'loading-spinner';
+            loadingSpinner.textContent = 'Loading more comments...';
+            loadingSpinner.style.cssText = 'text-align:center;padding:20px;color:#888;';
+            this.parentNode.insertBefore(loadingSpinner, this);
+            
+            // Simulate loading delay
+            setTimeout(function() {
+                const commentsList = document.getElementById('commentsList');
+                const newComments = [
+                    { name: 'Sarah Wilson', initials: 'SW', text: 'Great article! Very informative and well-written.' },
+                    { name: 'David Chen', initials: 'DC', text: 'This helped me understand affiliate marketing better.' }
+                ];
+                
+                newComments.forEach(function(comment) {
+                    const commentCard = document.createElement('div');
+                    commentCard.className = 'comment-card';
+                    commentCard.style.animation = 'fadeIn 0.5s ease';
+                    commentCard.innerHTML = `
+                        <div class="comment-avatar">${comment.initials}</div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <strong>${comment.name}</strong>
+                                <span class="comment-date">Just now</span>
+                            </div>
+                            <p>${comment.text}</p>
+                            <button class="reply-btn">Reply</button>
+                        </div>
+                    `;
+                    commentsList.appendChild(commentCard);
+                    
+                    // Add reply functionality to new buttons
+                    commentCard.querySelector('.reply-btn').addEventListener('click', function() {
+                        const commentContent = this.closest('.comment-content');
+                        const authorName = commentContent.querySelector('.comment-header strong').textContent;
+                        const commentTextarea = document.getElementById('commentText');
+                        if (commentTextarea) {
+                            commentTextarea.value = `@${authorName} `;
+                            commentTextarea.focus();
+                        }
+                    });
+                });
+                
+                // Remove loading spinner
+                loadingSpinner.remove();
+                loadMoreBtn.style.display = 'none';
+            }, 1000);
+        });
+    }
+});
+
+// ---------- CSS Animation ----------
+const styleSheet = document.createElement("style");
+styleSheet.textContent = `
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+`;
+document.head.appendChild(styleSheet);
+</script>
+{% endblock %}

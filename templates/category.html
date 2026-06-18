@@ -1,0 +1,560 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - Affiliate Products{% endblock %}
+
+{% block content %}
+<!-- Back Button -->
+<div class="back-button-container">
+    <button onclick="window.history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Go Back
+    </button>
+</div>
+
+<div class="category-header">
+    <div class="category-icon">
+        <i class="{{ category.icon }}"></i>
+    </div>
+    <h1>{{ category.name }}</h1>
+    <p>{{ category.description }}</p>
+    <div class="category-stats">
+        <span><i class="fas fa-box"></i> {{ products|length }} products</span>
+        <span><i class="fas fa-star"></i> Top-rated picks</span>
+    </div>
+</div>
+
+{% if products %}
+<div class="products-grid">
+    {% for product in products %}
+    <a href="{{ url_for('product', slug=product.slug) }}" class="product-card">
+        <div class="product-img">
+            {% if product.image_file %}
+                <img src="{{ url_for('static', filename='uploads/products/' + product.image_file) }}" alt="{{ product.name }}">
+            {% elif product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            {% else %}
+                <i class="{{ product.image_icon }} fa-3x"></i>
+            {% endif %}
+        </div>
+        <div class="product-info">
+            <h3>{{ product.name[:40] }}{% if product.name|length > 40 %}...{% endif %}</h3>
+            <div class="rating">
+                {% set full_stars = product.rating|int %}
+                {% set half_star = (product.rating - full_stars) >= 0.5 %}
+                {% for i in range(full_stars) %}
+                    <i class="fas fa-star"></i>
+                {% endfor %}
+                {% if half_star %}
+                    <i class="fas fa-star-half-alt"></i>
+                {% endif %}
+                {% for i in range(5 - full_stars - (1 if half_star else 0)) %}
+                    <i class="far fa-star"></i>
+                {% endfor %}
+                <span class="rating-count">({{ product.reviews_count }})</span>
+            </div>
+            <div class="product-price">₹{{ "%.2f"|format(product.price * 83) }}</div>
+            {% if product.original_price %}
+            <div class="discount-badge">Save {{ ((product.original_price - product.price) / product.original_price * 100)|int }}%</div>
+            {% endif %}
+            <div class="view-deal">View Deal →</div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if pagination and pagination.pages > 1 %}
+<div class="pagination">
+    {% if pagination.has_prev %}
+    <a href="{{ url_for('category', slug=category.slug, page=pagination.prev_num) }}" class="page-btn">
+        <i class="fas fa-chevron-left"></i> Previous
+    </a>
+    {% endif %}
+    
+    {% for page_num in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+        {% if page_num %}
+            {% if page_num == pagination.page %}
+            <span class="page-btn active">{{ page_num }}</span>
+            {% else %}
+            <a href="{{ url_for('category', slug=category.slug, page=page_num) }}" class="page-btn">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            <span class="page-dots">...</span>
+        {% endif %}
+    {% endfor %}
+    
+    {% if pagination.has_next %}
+    <a href="{{ url_for('category', slug=category.slug, page=pagination.next_num) }}" class="page-btn">
+        Next <i class="fas fa-chevron-right"></i>
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-category">
+    <i class="fas fa-box-open fa-4x"></i>
+    <h3>No products yet</h3>
+    <p>Check back soon for amazing affiliate products in this category!</p>
+    <a href="{{ url_for('index') }}" class="btn-primary">Browse Other Categories</a>
+</div>
+{% endif %}
+
+<style>
+
+/* Back Button */
+.back-button-container {
+    margin-bottom: 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    color: #1a1a1a;
+    padding: 8px 18px;
+    border-radius: 40px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    border-color: #1a1a1a;
+    background: rgba(0,0,0,0.02);
+    transform: translateX(-3px);
+}
+
+/* Category Header */
+.category-header {
+    text-align: center;
+    margin: 20px 0 40px;
+    padding: 30px;
+    background: #f8f8f8;
+    border-radius: 24px;
+}
+
+.category-icon {
+    width: 70px;
+    height: 70px;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 1px solid #e0e0e0;
+    color: #1a1a1a;
+}
+
+.category-icon i {
+    font-size: 2rem;
+}
+
+.category-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #1a1a1a;
+}
+
+.category-header p {
+    font-size: 1rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.category-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.category-stats span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    color: #1a1a1a;
+}
+
+/* Products Grid - Desktop: 4 columns */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    margin: 40px 0;
+}
+
+.product-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    border-color: #1a1a1a;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+.product-img {
+    height: 180px;
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-img i {
+    color: #1a1a1a;
+}
+
+.product-info {
+    padding: 15px;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-info h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    min-height: 38px;
+}
+
+.rating {
+    color: #f5a623;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: wrap;
+}
+
+.rating-count {
+    color: #888;
+    font-size: 0.65rem;
+    margin-left: 4px;
+}
+
+.product-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 5px 0;
+}
+
+.discount-badge {
+    font-size: 0.65rem;
+    color: #ff4757;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.view-deal {
+    background: #1a1a1a;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 40px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin-top: auto;
+    text-align: center;
+}
+
+.product-card:hover .view-deal {
+    background: #333;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+}
+
+.page-btn {
+    padding: 10px 18px;
+    border-radius: 40px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+.page-btn.active {
+    background: #1a1a1a;
+    color: #ffffff;
+    border-color: #1a1a1a;
+    cursor: default;
+}
+
+.page-btn:hover:not(.active) {
+    border-color: #1a1a1a;
+    transform: translateY(-2px);
+}
+
+.page-dots {
+    padding: 10px 5px;
+    color: #888;
+}
+
+/* Empty State */
+.empty-category {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-category i {
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.empty-category h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.empty-category p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.btn-primary {
+    background: #1a1a1a;
+    color: #ffffff;
+    border: none;
+    border-radius: 40px;
+    padding: 12px 28px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   Desktop: 4 columns
+   Tablet: 3 columns
+   Mobile: 2 columns (2 rows visible)
+   ============================================ */
+
+/* Desktop Large (1200px+) */
+@media (min-width: 1200px) {
+    .products-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+    }
+}
+
+/* Laptop (992px - 1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+/* Tablet (577px - 991px) */
+@media (min-width: 577px) and (max-width: 991px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    .product-img {
+        height: 160px;
+    }
+    
+    .category-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Mobile (up to 576px) - 2 columns (2 rows visible) */
+@media (max-width: 576px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .product-img {
+        height: 130px;
+    }
+    
+    .product-info {
+        padding: 10px;
+    }
+    
+    .product-info h3 {
+        font-size: 0.75rem;
+        min-height: 30px;
+        margin-bottom: 5px;
+    }
+    
+    .rating {
+        font-size: 0.6rem;
+        margin-bottom: 5px;
+    }
+    
+    .rating i {
+        font-size: 0.6rem;
+    }
+    
+    .rating-count {
+        font-size: 0.55rem;
+    }
+    
+    .product-price {
+        font-size: 0.9rem;
+        margin: 3px 0;
+    }
+    
+    .discount-badge {
+        font-size: 0.55rem;
+        margin-bottom: 6px;
+    }
+    
+    .view-deal {
+        padding: 6px 8px;
+        font-size: 0.6rem;
+    }
+    
+    .category-header {
+        padding: 15px;
+        margin: 10px 0 25px;
+    }
+    
+    .category-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .category-icon i {
+        font-size: 1.5rem;
+    }
+    
+    .category-header h1 {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+    }
+    
+    .category-header p {
+        font-size: 0.8rem;
+    }
+    
+    .category-stats span {
+        font-size: 0.7rem;
+        padding: 4px 12px;
+    }
+    
+    .category-stats {
+        gap: 15px;
+        margin-top: 12px;
+    }
+    
+    .back-btn {
+        padding: 5px 12px;
+        font-size: 0.7rem;
+    }
+    
+    .pagination {
+        gap: 5px;
+    }
+    
+    .page-btn {
+        padding: 5px 10px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Small Mobile (up to 380px) - Still 2 columns but smaller */
+@media (max-width: 380px) {
+    .products-grid {
+        gap: 8px;
+    }
+    
+    .product-img {
+        height: 110px;
+    }
+    
+    .product-info {
+        padding: 8px;
+    }
+    
+    .product-info h3 {
+        font-size: 0.7rem;
+        min-height: 28px;
+    }
+    
+    .product-price {
+        font-size: 0.8rem;
+    }
+    
+    .view-deal {
+        padding: 5px 6px;
+        font-size: 0.55rem;
+    }
+}
+
+/* Very Small Mobile (up to 320px) */
+@media (max-width: 320px) {
+    .products-grid {
+        gap: 6px;
+    }
+    
+    .product-img {
+        height: 100px;
+    }
+    
+    .product-info h3 {
+        font-size: 0.65rem;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,455 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Manage Users - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-users"></i> Manage Users</h1>
+        <div class="header-stats">
+            <span class="total-badge">Total: {{ users|length }}</span>
+            <span class="admin-count-badge">Admins: {{ users|selectattr('is_admin', 'equalto', true)|list|length }}</span>
+            <span class="user-count-badge">Users: {{ users|selectattr('is_admin', 'equalto', false)|list|length }}</span>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by username, email, or role...">
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="admin-table-full" id="usersTable">
+            <thead>
+                <tr>
+                    <th width="50">ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th width="120">Joined Date</th>
+                    <th width="100">Status</th>
+                    <th width="200">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr data-user-id="{{ user.id }}" 
+                    data-username="{{ user.username|lower }}" 
+                    data-email="{{ user.email|lower }}"
+                    data-role="{% if user.is_admin %}admin{% else %}user{% endif %}">
+                    <td class="text-center">{{ user.id }}</td>
+                    <td class="username-cell"><strong>{{ user.username }}</strong>{% if user.id == current_user.id %} <span class="self-badge">You</span>{% endif %}</td>
+                    <td class="email-cell">{{ user.email }}</td>
+                    <td class="date-cell">{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</td>
+                    <td class="text-center">
+                        {% if user.is_admin %}
+                            <span class="badge-admin">👑 Admin</span>
+                        {% else %}
+                            <span class="badge-user">👤 User</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions">
+                        {% if user.id != current_user.id %}
+                            <button class="btn-toggle" data-id="{{ user.id }}" data-is-admin="{{ user.is_admin|lower }}">
+                                {% if user.is_admin %}
+                                    <i class="fas fa-user-minus"></i> Remove Admin
+                                {% else %}
+                                    <i class="fas fa-user-shield"></i> Make Admin
+                                {% endif %}
+                            </button>
+                            <button class="btn-delete" data-id="{{ user.id }}" data-username="{{ user.username }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        {% else %}
+                            <span class="current-user-badge"><i class="fas fa-user-check"></i> Current User</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- No Results Message -->
+    <div class="no-results" id="noResults" style="display: none;">
+        <i class="fas fa-search fa-3x"></i>
+        <h3>No users found</h3>
+        <p>Try a different search term.</p>
+    </div>
+</div>
+
+<style>
+.admin-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.admin-header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1a1a1a;
+}
+
+.header-stats {
+    display: flex;
+    gap: 12px;
+}
+
+.total-badge, .admin-count-badge, .user-count-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.total-badge {
+    background: #f0f0f0;
+    color: #1a1a1a;
+}
+
+.admin-count-badge {
+    background: #e8eaf6;
+    color: #3f51b5;
+}
+
+.user-count-badge {
+    background: #e8f5e9;
+    color: #4CAF50;
+}
+
+/* Search Section */
+.search-section {
+    margin-bottom: 20px;
+}
+
+.search-box {
+    position: relative;
+    max-width: 350px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #e0e0e0;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    background: #ffffff;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+/* Table Styles */
+.table-responsive {
+    overflow-x: auto;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
+}
+
+.admin-table-full {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.admin-table-full th,
+.admin-table-full td {
+    padding: 15px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-table-full th {
+    font-weight: 600;
+    background: #f8f9fa;
+    color: #1a1a1a;
+}
+
+.admin-table-full tr:hover {
+    background: #fafafa;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.username-cell {
+    font-weight: 500;
+}
+
+.email-cell {
+    color: #666;
+}
+
+.date-cell {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.self-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #e3f2fd;
+    color: #1976d2;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.badge-admin, .badge-user {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-admin {
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+.badge-user {
+    background: #e0e0e0;
+    color: #1a1a1a;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-toggle, .btn-delete {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-toggle {
+    background: #2196F3;
+    color: white;
+}
+
+.btn-toggle:hover {
+    background: #0b7dda;
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    background: #f44336;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+}
+
+.current-user-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    background: #e0e0e0;
+    color: #666;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+    margin-top: 20px;
+}
+
+.no-results i {
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.no-results h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.no-results p {
+    color: #888;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .header-stats {
+        justify-content: center;
+    }
+    
+    .search-box {
+        max-width: 100%;
+    }
+    
+    .actions {
+        flex-direction: column;
+    }
+    
+    .btn-toggle, .btn-delete {
+        justify-content: center;
+        width: 100%;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== TOGGLE ADMIN FUNCTIONALITY ==========
+    var toggleButtons = document.querySelectorAll('.btn-toggle');
+    toggleButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var userId = this.getAttribute('data-id');
+            var isCurrentlyAdmin = this.getAttribute('data-is-admin') === 'true';
+            var action = isCurrentlyAdmin ? 'remove admin privileges from' : 'make admin';
+            
+            if (confirm('Are you sure you want to ' + action + ' this user?')) {
+                fetch('/admin-panel/user/toggle-admin/' + userId, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(function(response) {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error updating user. Please try again.');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Error updating user. Please try again.');
+                });
+            }
+        });
+    });
+    
+    // ========== DELETE USER FUNCTIONALITY ==========
+    var deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var userId = this.getAttribute('data-id');
+            var username = this.getAttribute('data-username');
+            
+            if (confirm('Are you sure you want to delete user "' + username + '"? This action cannot be undone.')) {
+                fetch('/admin-panel/user/delete/' + userId, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(function(response) {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting user. Please try again.');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Error deleting user. Please try again.');
+                });
+            }
+        });
+    });
+    
+    // ========== SEARCH FUNCTIONALITY ==========
+    var searchInput = document.getElementById('searchInput');
+    var tableRows = document.querySelectorAll('#usersTable tbody tr');
+    var noResultsDiv = document.getElementById('noResults');
+    var tableContainer = document.querySelector('.table-responsive');
+    
+    function filterTable() {
+        var searchTerm = searchInput.value.toLowerCase().trim();
+        var visibleCount = 0;
+        
+        tableRows.forEach(function(row) {
+            var username = row.getAttribute('data-username') || '';
+            var email = row.getAttribute('data-email') || '';
+            var role = row.getAttribute('data-role') || '';
+            
+            if (username.includes(searchTerm) || email.includes(searchTerm) || role.includes(searchTerm) || searchTerm === '') {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        if (visibleCount === 0 && searchTerm !== '') {
+            tableContainer.style.display = 'none';
+            noResultsDiv.style.display = 'block';
+        } else {
+            tableContainer.style.display = 'block';
+            noResultsDiv.style.display = 'none';
+        }
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', filterTable);
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+

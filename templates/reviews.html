@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Reviews - Affiliate Marketplace{% endblock %}
+
+{% block content %}
+<div class="reviews-header">
+    <h1><i class="fas fa-star"></i> Customer Reviews</h1>
+    <p>What our community says about our recommended products</p>
+</div>
+
+<!-- Rating Summary -->
+<div class="rating-summary">
+    <div class="overall-rating">
+        <div class="rating-number">{{ "%.1f"|format(avg_rating) }}</div>
+        <div class="rating-stars">
+            {% set full_stars = avg_rating|int %}
+            {% set half_star = (avg_rating - full_stars) >= 0.5 %}
+            {% for i in range(full_stars) %}
+                <i class="fas fa-star"></i>
+            {% endfor %}
+            {% if half_star %}
+                <i class="fas fa-star-half-alt"></i>
+            {% endif %}
+            {% for i in range(5 - full_stars - (1 if half_star else 0)) %}
+                <i class="far fa-star"></i>
+            {% endfor %}
+        </div>
+        <div class="rating-count">Based on {{ total_reviews }} reviews</div>
+    </div>
+</div>
+
+<!-- Reviews Grid -->
+{% if reviews.items %}
+<div class="reviews-grid">
+    {% for review in reviews.items %}
+    <div class="review-card-large">
+        <div class="review-header">
+            <div class="reviewer-info">
+                <div class="reviewer-avatar">{{ review.user_avatar }}</div>
+                <div>
+                    <h4>{{ review.user_name }}</h4>
+                    <div class="review-rating">
+                        {% for i in range(review.rating) %}
+                            <i class="fas fa-star"></i>
+                        {% endfor %}
+                        {% for i in range(5 - review.rating) %}
+                            <i class="far fa-star"></i>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="review-date">{{ review.created_at.strftime('%B %d, %Y') if review.created_at else 'Recent' }}</div>
+        </div>
+        <div class="review-product">
+            <i class="fas fa-tag"></i> Product: 
+            <a href="{{ url_for('product', slug=review.product.slug) if review.product else '#' }}">
+                {{ review.product.name if review.product else 'Product' }}
+            </a>
+        </div>
+        <div class="review-comment">
+            <i class="fas fa-quote-left"></i>
+            <p>{{ review.comment }}</p>
+        </div>
+        <div class="review-helpful">
+            <button class="helpful-btn" data-id="{{ review.id }}">
+                <i class="fas fa-thumbs-up"></i> Helpful ({{ review.helpful_count or 0 }})
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if pagination and pagination.pages > 1 %}
+<div class="pagination">
+    {% if pagination.has_prev %}
+    <a href="{{ url_for('reviews_page', page=pagination.prev_num) }}" class="page-btn">← Previous</a>
+    {% endif %}
+    
+    <span class="page-btn active">Page {{ pagination.page }} of {{ pagination.pages }}</span>
+    
+    {% if pagination.has_next %}
+    <a href="{{ url_for('reviews_page', page=pagination.next_num) }}" class="page-btn">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="no-reviews">
+    <i class="fas fa-comment-dots fa-4x"></i>
+    <h3>No Reviews Yet</h3>
+    <p>Be the first to share your experience!</p>
+</div>
+{% endif %}
+
+<style>
+/* ============================================
+   REVIEWS PAGE - WHITE THEME / BLACK ACCENTS
+   ============================================ */
+
+.reviews-header {
+    text-align: center;
+    margin: 40px 0 30px;
+}
+
+.reviews-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.reviews-header p {
+    font-size: 1.1rem;
+    color: #888888;
+}
+
+.rating-summary {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.overall-rating {
+    text-align: center;
+    padding: 30px;
+    border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    min-width: 250px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.rating-number {
+    font-size: 4rem;
+    font-weight: 800;
+    color: #f5a623;
+}
+
+.rating-stars {
+    font-size: 1.5rem;
+    color: #f5a623;
+    margin: 10px 0;
+}
+
+.rating-count {
+    font-size: 0.9rem;
+    color: #888888;
+}
+
+.reviews-grid {
+    display: grid;
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.review-card-large {
+    padding: 25px;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    transition: 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.review-card-large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border-color: #1a1a1a;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.reviewer-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+.reviewer-info h4 {
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+    color: #1a1a1a;
+}
+
+.review-rating {
+    color: #f5a623;
+    font-size: 0.9rem;
+}
+
+.review-date {
+    font-size: 0.8rem;
+    color: #888888;
+}
+
+.review-product {
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: #666666;
+}
+
+.review-product a {
+    text-decoration: none;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.review-product a:hover {
+    text-decoration: underline;
+}
+
+.review-comment {
+    display: flex;
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.review-comment i {
+    font-size: 1.2rem;
+    color: #888888;
+}
+
+.review-comment p {
+    line-height: 1.6;
+    font-size: 0.95rem;
+    color: #555555;
+}
+
+.review-helpful {
+    margin-top: 15px;
+}
+
+.helpful-btn {
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    padding: 6px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+    color: #666666;
+}
+
+.helpful-btn:hover {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 50px 0 70px;
+    flex-wrap: wrap;
+}
+
+.page-btn {
+    padding: 10px 20px;
+    border-radius: 40px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: 0.2s;
+    background: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid #e0e0e0;
+}
+
+.page-btn.active {
+    background: #1a1a1a;
+    color: #ffffff;
+    border-color: #1a1a1a;
+}
+
+.page-btn:hover:not(.active) {
+    border-color: #1a1a1a;
+    transform: translateY(-2px);
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.no-reviews i {
+    color: #888888;
+    margin-bottom: 20px;
+}
+
+.no-reviews h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.no-reviews p {
+    color: #888888;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .reviews-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .review-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .reviewer-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .review-comment {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .rating-number {
+        font-size: 3rem;
+    }
+    
+    .pagination {
+        gap: 8px;
+    }
+    
+    .page-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+}
+</style>
+
+<script>
+// Helpful button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.helpful-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var reviewId = this.getAttribute('data-id');
+            fetch('/api/review/helpful/' + reviewId, { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    btn.innerHTML = '<i class="fas fa-thumbs-up"></i> Helpful (' + data.count + ')';
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+
+
+
+
+

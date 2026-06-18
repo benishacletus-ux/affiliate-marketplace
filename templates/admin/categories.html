@@ -1,0 +1,427 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Manage Categories - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-tags"></i> Manage Categories</h1>
+        <a href="{{ url_for('admin_add_category') }}" class="btn-primary">
+            <i class="fas fa-plus"></i> Add Category
+        </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search categories by name, slug, or description...">
+        </div>
+    </div>
+
+    <div class="categories-grid" id="categoriesGrid">
+        {% for cat in categories %}
+        <div class="category-card" data-category-id="{{ cat.id }}" 
+             data-name="{{ cat.name|lower }}" 
+             data-slug="{{ cat.slug|lower }}" 
+             data-description="{{ cat.description|lower if cat.description else '' }}"
+             data-product-count="{{ cat.products|length if cat.products else 0 }}">
+            <div class="category-icon"><i class="{{ cat.icon }} fa-2x"></i></div>
+            <div class="category-info">
+                <h3>{{ cat.name }}</h3>
+                <p>{{ cat.description[:80] if cat.description else 'No description available' }}</p>
+                <div class="category-meta">
+                    <span class="meta-tag"><i class="fas fa-link"></i> {{ cat.slug }}</span>
+                    <span class="meta-tag"><i class="fas fa-sort-numeric-down"></i> Order: {{ cat.display_order }}</span>
+                    <span class="meta-tag"><i class="fas fa-box"></i> Products: {{ cat.products|length if cat.products else 0 }}</span>
+                </div>
+            </div>
+            <div class="category-actions">
+                <a href="{{ url_for('admin_edit_category', id=cat.id) }}" class="btn-edit">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <button class="btn-delete" data-id="{{ cat.id }}" data-name="{{ cat.name }}" data-count="{{ cat.products|length if cat.products else 0 }}">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- No Results Message -->
+    <div class="no-results" id="noResults" style="display: none;">
+        <i class="fas fa-search fa-3x"></i>
+        <h3>No categories found</h3>
+        <p>Try a different search term or <a href="{{ url_for('admin_add_category') }}">add a new category</a>.</p>
+    </div>
+</div>
+
+<style>
+.admin-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.admin-header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1a1a1a;
+}
+
+/* Search Section */
+.search-section {
+    margin-bottom: 25px;
+}
+
+.search-box {
+    position: relative;
+    max-width: 350px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #e0e0e0;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    background: #ffffff;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+/* Categories Grid */
+.categories-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.category-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 20px;
+    transition: all 0.25s ease;
+    flex-wrap: wrap;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.category-card:hover {
+    transform: translateX(5px);
+    border-color: #1a1a1a;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.category-icon {
+    width: 70px;
+    height: 70px;
+    background: #f8f8f8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: 0.2s;
+}
+
+.category-card:hover .category-icon {
+    background: #1a1a1a;
+}
+
+.category-icon i {
+    color: #1a1a1a;
+    font-size: 2rem;
+    transition: 0.2s;
+}
+
+.category-card:hover .category-icon i {
+    color: #ffffff;
+}
+
+.category-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.category-info h3 {
+    margin-bottom: 8px;
+    font-size: 1.2rem;
+    color: #1a1a1a;
+}
+
+.category-info p {
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.category-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.meta-tag {
+    font-size: 0.7rem;
+    color: #888;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meta-tag i {
+    font-size: 0.65rem;
+}
+
+.category-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.btn-edit, .btn-delete {
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-edit {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    background: #f44336;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.no-results i {
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.no-results h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.no-results p {
+    color: #888;
+}
+
+.no-results a {
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.no-results a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .search-box {
+        max-width: 100%;
+    }
+    
+    .category-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .category-info {
+        text-align: center;
+    }
+    
+    .category-meta {
+        justify-content: center;
+    }
+    
+    .category-actions {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .btn-edit, .btn-delete {
+        flex: 1;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== DELETE CATEGORY FUNCTIONALITY ==========
+    var deleteButtons = document.querySelectorAll('.btn-delete');
+    
+    deleteButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var categoryId = this.getAttribute('data-id');
+            var categoryName = this.getAttribute('data-name');
+            var productCount = parseInt(this.getAttribute('data-count'));
+            
+            if (productCount > 0) {
+                alert('Cannot delete category "' + categoryName + '"! It has ' + productCount + ' product(s). Please remove or reassign all products first.');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to delete category "' + categoryName + '"? This action cannot be undone.')) {
+                // Show loading state
+                var originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                this.disabled = true;
+                
+                // FIXED: Correct URL for admin_app.py (NO /admin-panel prefix)
+                var deleteUrl = '/category/delete/' + categoryId;
+                
+                console.log('Deleting category at:', deleteUrl);
+                
+                fetch(deleteUrl, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(function(response) {
+                    console.log('Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error('Server returned ' + response.status);
+                    }
+                    
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        // Remove the category card from DOM
+                        var card = button.closest('.category-card');
+                        if (card) {
+                            card.remove();
+                        }
+                        alert('Category "' + categoryName + '" deleted successfully!');
+                    } else {
+                        alert(data.error || 'Error deleting category. Please try again.');
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Error deleting category: ' + error.message);
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                });
+            }
+        });
+    });
+    
+    // ========== SEARCH FUNCTIONALITY ==========
+    var searchInput = document.getElementById('searchInput');
+    var categoryCards = document.querySelectorAll('.category-card');
+    var categoriesGrid = document.getElementById('categoriesGrid');
+    var noResultsDiv = document.getElementById('noResults');
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            var searchTerm = this.value.toLowerCase().trim();
+            var visibleCount = 0;
+            
+            categoryCards.forEach(function(card) {
+                var name = card.getAttribute('data-name') || '';
+                var slug = card.getAttribute('data-slug') || '';
+                var description = card.getAttribute('data-description') || '';
+                
+                if (name.includes(searchTerm) || slug.includes(searchTerm) || description.includes(searchTerm) || searchTerm === '') {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            if (visibleCount === 0 && searchTerm !== '') {
+                categoriesGrid.style.display = 'none';
+                noResultsDiv.style.display = 'block';
+            } else {
+                categoriesGrid.style.display = 'flex';
+                noResultsDiv.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+

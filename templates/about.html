@@ -1,0 +1,431 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - Affiliate Marketplace{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <!-- Hero Section -->
+    <div class="about-hero">
+        <h1>About Our Marketplace</h1>
+        <p>Your Trusted Source for Product Reviews, Buying Guides & Smart Recommendations</p>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="mission-section">
+        <div class="mission-content">
+            <h2>Our Mission</h2>
+            <p>At ABBEN HUB, our mission is to help people make informed purchasing decisions by providing detailed product reviews, comparisons, and buying guides.</p>
+            <p>We carefully research products, analyze features, and recommend solutions that offer genuine value. Whether you're looking for technology, software, online tools, or everyday essentials, our goal is to simplify your buying journey.</p>
+        </div>
+        <div class="mission-stats">
+            <div class="stat-card">
+                <div class="stat-number">100+</div>
+                <div class="stat-label">Products Reviewed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Buying Guides</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">20+</div>
+                <div class="stat-label">Product Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">Growing Daily%</div>
+                <div class="stat-label">Happy Readers</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Section -->
+    <div class="story-section">
+        <div class="story-text">
+            <h2>Our Story</h2>
+            <p>ABBEN HUB was founded with a simple vision: helping consumers find the right products without spending hours searching through countless websites.</p>
+            <p>As online shopping continues to grow, finding trustworthy information has become more important than ever. That's why we focus on creating transparent, easy-to-understand content that helps readers compare products, discover better alternatives, and make confident buying decisions.</p>
+            <p>Every recommendation on ABBEN HUB is designed to provide value, save time, and improve the shopping experience.</p>
+        </div>
+        <div class="story-image">
+            <i class="fas fa-chart-line fa-6x"></i>
+        </div>
+    </div>
+
+    <!-- Values Section -->
+    <div class="values-section">
+        <h2>Our Core Values</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <i class="fas fa-shield-alt fa-3x"></i>
+                <h3>Transparency</h3>
+                <p>We clearly disclose affiliate relationships and maintain honesty in our recommendations.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-heart fa-3x"></i>
+                <h3>Trust</h3>
+                <p>We recommend products based on research, quality, and usefulness.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-star fa-3x"></i>
+                <h3>Value</h3>
+                <p>Our goal is to help users find products that offer the best balance of quality and price.</p>
+            </div>
+            <div class="value-card">
+                <i class="fas fa-hand-holding-usd fa-3x"></i>
+                <h3>Continuous Learning</h3>
+                <p>We constantly explore new products, tools, and technologies to keep our content relevant and useful.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="how-it-works">
+        <h2>How It Works</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <i class="fas fa-search fa-2x"></i>
+                <h3>Research Products</h3>
+                <p>We analyze products, software, and services from trusted brands.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <i class="fas fa-chart-line fa-2x"></i>
+                <h3>Compare Features</h3>
+                <p>We compare specifications, pricing, and benefits to highlight the best options.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <i class="fas fa-shopping-cart fa-2x"></i>
+                <h3>Create Helpful Content</h3>
+                <p>We publish reviews, comparisons, and buying guides for our readers.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <i class="fas fa-gift fa-2x"></i>
+                <h3>Recommend the Best Choices</h3>
+                <p>Users can confidently choose products that fit their needs and budget.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact CTA -->
+    <div class="contact-cta">
+        <h2>Have Questions or Suggestions?</h2>
+        <p>We're always looking to improve ABBEN HUB and provide better recommendations for our readers.</p>
+        <a href="/contact" class="contact-btn">
+            <i class="fas fa-envelope"></i> Contact Us
+        </a>
+    </div>
+</div>
+
+<style>
+/* About Page Styles */
+.about-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Hero Section */
+.about-hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-radius: 24px;
+    color: white;
+    margin-bottom: 50px;
+}
+
+.about-hero h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+.about-hero p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* Mission Section */
+.mission-section {
+    margin-bottom: 60px;
+}
+
+.mission-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 40px;
+}
+
+.mission-content h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #1a1a1a;
+}
+
+.mission-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.mission-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: #666;
+}
+
+/* Story Section */
+.story-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+    margin-bottom: 60px;
+    background: #f8f8f8;
+    padding: 50px;
+    border-radius: 24px;
+}
+
+.story-text h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #1a1a1a;
+}
+
+.story-text p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.story-image {
+    text-align: center;
+    color: #1a1a1a;
+}
+
+.story-image i {
+    opacity: 0.8;
+}
+
+/* Values Section */
+.values-section {
+    margin-bottom: 60px;
+}
+
+.values-section h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #1a1a1a;
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.value-card {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+    transition: 0.2s;
+}
+
+.value-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.value-card i {
+    color: #1a1a1a;
+    margin-bottom: 20px;
+}
+
+.value-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #1a1a1a;
+}
+
+.value-card p {
+    color: #666;
+    line-height: 1.5;
+}
+
+/* How It Works */
+.how-it-works {
+    margin-bottom: 60px;
+    background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+    padding: 50px;
+    border-radius: 24px;
+}
+
+.how-it-works h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 40px;
+    color: #1a1a1a;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+}
+
+.step {
+    text-align: center;
+    position: relative;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: #1a1a1a;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.step i {
+    color: #1a1a1a;
+    margin-bottom: 15px;
+}
+
+.step h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.step p {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Contact CTA */
+.contact-cta {
+    text-align: center;
+    padding: 50px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-radius: 24px;
+    color: white;
+}
+
+.contact-cta h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.contact-cta p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    opacity: 0.9;
+}
+
+.contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    color: #1a1a1a;
+    padding: 12px 30px;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .about-hero h1 {
+        font-size: 2rem;
+    }
+    
+    .about-hero p {
+        font-size: 1rem;
+    }
+    
+    .story-section {
+        grid-template-columns: 1fr;
+        padding: 30px;
+    }
+    
+    .mission-stats {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .stat-number {
+        font-size: 1.8rem;
+    }
+    
+    .steps {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .contact-cta {
+        padding: 30px;
+    }
+    
+    .contact-cta h2 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+
+
+
+

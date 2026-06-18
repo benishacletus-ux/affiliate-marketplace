@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results for "{{ query }}" - Affiliate Marketplace{% endblock %}
+
+{% block content %}
+<div class="search-results-header">
+    <h1><i class="fas fa-search"></i> Search Results</h1>
+    <p>Showing results for: <strong>"{{ query }}"</strong></p>
+    <p class="results-count">Found {{ total_results }} result(s)</p>
+</div>
+
+<!-- Products Section -->
+{% if products %}
+<div class="section-head">
+    <h2><i class="fas fa-box"></i> Products ({{ products|length }})</h2>
+</div>
+<div class="products-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="product-img">
+            <i class="{{ product.image_icon }} fa-3x"></i>
+        </div>
+        <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <div class="rating">
+                {% set full_stars = product.rating|int %}
+                {% set half_star = (product.rating - full_stars) >= 0.5 %}
+                {% for i in range(full_stars) %}
+                    <i class="fas fa-star"></i>
+                {% endfor %}
+                {% if half_star %}
+                    <i class="fas fa-star-half-alt"></i>
+                {% endif %}
+                {% for i in range(5 - full_stars - (1 if half_star else 0)) %}
+                    <i class="far fa-star"></i>
+                {% endfor %}
+                <span class="rating-count">({{ product.reviews_count }} reviews)</span>
+            </div>
+            <div class="product-price">₹{{ "%.2f"|format(product.price * 83) }}</div>
+            {% if product.original_price %}
+            <div class="original-price">Was: ₹{{ "%.2f"|format(product.original_price * 83) }}</div>
+            <div class="discount-badge">-{{ ((product.original_price - product.price) / product.original_price * 100)|int }}%</div>
+            {% endif %}
+            <div class="commission-badge">
+                <i class="fas fa-fire"></i> {{ product.commission_rate }}% commission
+            </div>
+            <a href="{{ url_for('product', slug=product.slug) }}" class="affiliate-btn">
+                View Deal <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Blog Posts Section -->
+{% if posts %}
+<div class="section-head">
+    <h2><i class="fas fa-newspaper"></i> Blog Posts ({{ posts|length }})</h2>
+</div>
+<div class="blog-grid">
+    {% for post in posts %}
+    <a href="{{ url_for('blog_post', slug=post.slug) }}" class="blog-card">
+        <div class="blog-img">
+            <i class="{{ post.image_icon }} fa-3x"></i>
+        </div>
+        <div class="blog-content">
+            <div class="blog-category">{{ post.category }}</div>
+            <h4>{{ post.title }}</h4>
+            <p>{{ post.excerpt[:100] }}...</p>
+            <div class="blog-meta">
+                <span><i class="fas fa-user"></i> {{ post.author }}</span>
+                <span><i class="fas fa-eye"></i> {{ post.views }} views</span>
+            </div>
+            <span class="read-more">Read More →</span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- No Results -->
+{% if not products and not posts %}
+<div class="no-results">
+    <i class="fas fa-face-frown fa-4x"></i>
+    <h3>No results found for "{{ query }}"</h3>
+    <p>Try different keywords or browse our categories</p>
+    <div class="no-results-actions">
+        <a href="{{ url_for('index') }}" class="btn-primary">Back to Home</a>
+        <a href="{{ url_for('all_categories') }}" class="btn-outline">Browse Categories</a>
+    </div>
+</div>
+{% endif %}
+
+<style>
+/* ============================================
+   SEARCH RESULTS PAGE - WHITE THEME / BLACK ACCENTS
+   ============================================ */
+
+.search-results-header {
+    text-align: center;
+    margin: 40px 0 30px;
+    padding: 30px;
+    border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.search-results-header h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #1a1a1a;
+}
+
+.search-results-header p {
+    font-size: 1.1rem;
+    color: #666666;
+}
+
+.results-count {
+    font-size: 0.9rem;
+    color: #888888;
+    margin-top: 10px;
+}
+
+/* Section Headings */
+.section-head {
+    text-align: center;
+    margin: 40px 0 30px;
+}
+
+.section-head h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+/* Products Grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.product-card {
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    border-color: #1a1a1a;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.product-img {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f8f8;
+}
+
+.product-img i {
+    font-size: 3.5rem;
+    color: #1a1a1a;
+}
+
+.product-info {
+    padding: 20px;
+}
+
+.product-info h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.rating {
+    margin: 10px 0;
+    color: #f5a623;
+    font-size: 0.85rem;
+}
+
+.rating-count {
+    color: #888888;
+    font-size: 0.75rem;
+    margin-left: 5px;
+}
+
+.product-price {
+    font-weight: 800;
+    font-size: 1.3rem;
+    margin: 10px 0;
+    color: #1a1a1a;
+}
+
+.original-price {
+    font-size: 0.8rem;
+    text-decoration: line-through;
+    color: #888888;
+}
+
+.discount-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #ff4757;
+    color: white;
+    margin: 5px 0;
+}
+
+.commission-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin: 10px 0;
+    background: #f0f0f0;
+    color: #1a1a1a;
+}
+
+.affiliate-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 40px;
+    font-weight: 600;
+    text-align: center;
+    display: block;
+    text-decoration: none;
+    transition: 0.2s;
+    margin-top: 15px;
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+.affiliate-btn:hover {
+    background: #333333;
+    transform: scale(0.98);
+}
+
+/* Blog Grid */
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.blog-card {
+    text-decoration: none;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: 0.2s;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    border-color: #1a1a1a;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+.blog-img {
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f8f8;
+}
+
+.blog-img i {
+    font-size: 3rem;
+    color: #1a1a1a;
+}
+
+.blog-content {
+    padding: 20px;
+}
+
+.blog-category {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #888888;
+}
+
+.blog-content h4 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    color: #1a1a1a;
+}
+
+.blog-content p {
+    font-size: 0.85rem;
+    color: #666666;
+    line-height: 1.5;
+}
+
+.blog-meta {
+    display: flex;
+    gap: 15px;
+    margin: 10px 0;
+    font-size: 0.7rem;
+    color: #888888;
+}
+
+.read-more {
+    display: inline-block;
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #1a1a1a;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.no-results i {
+    margin-bottom: 20px;
+    color: #888888;
+}
+
+.no-results h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+.no-results p {
+    margin-bottom: 30px;
+    color: #666666;
+}
+
+.no-results-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-primary, .btn-outline {
+    padding: 12px 28px;
+    border-radius: 40px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: #1a1a1a;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #333333;
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    color: #1a1a1a;
+}
+
+.btn-outline:hover {
+    border-color: #1a1a1a;
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-results-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .products-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .blog-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .no-results-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .no-results-actions .btn-primary,
+    .no-results-actions .btn-outline {
+        width: 100%;
+        max-width: 250px;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+
+
+
+

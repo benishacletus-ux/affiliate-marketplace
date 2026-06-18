@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Affiliate Marketplace{% endblock %}
+
+{% block content %}
+<div class="contact-container">
+    <h1>Contact Us</h1>
+    <p>Get in touch with our team</p>
+    
+    <div class="contact-form">
+        <form method="POST" action="/contact">
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <input type="text" name="subject" placeholder="Subject" required>
+            <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+

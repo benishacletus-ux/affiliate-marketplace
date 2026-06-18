@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block title %}Terms of Service - Affiliate Marketplace{% endblock %}
+
+{% block content %}
+<div class="legal-container">
+    <div class="legal-header">
+        <h1>Terms of Service</h1>
+        <p>Last updated: {{ "now"|datetime }}</p>
+        <p class="legal-subtitle">Please read these terms carefully before using our platform</p>
+    </div>
+
+    <div class="legal-content">
+        <div class="legal-section">
+            <h2>1. Website Purpose</h2>
+            <p>This website provides product recommendations, reviews, buying guides, and affiliate links to third-party products and services.</p>
+            <p>We do not directly sell, ship, or manufacture any products listed on this website.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>2. Affiliate Disclosure</h2>
+            <p>Some links on this website are affiliate links.</p>
+            <p>This means that if you click a link and make a purchase, we may earn a commission at no additional cost to you.</p>
+            <p>Our recommendations are based on research, reviews, and personal opinions.</p>
+           
+        </div>
+
+        <div class="legal-section">
+            <h2>3. Product Information</h2>
+            <p>We strive to provide accurate and up-to-date information. However:</p>
+            <ul>
+                <li>Product prices may change without notice.</li>
+                <li>Product availability may vary.</li>
+                <li>Product specifications may change.</li>
+                <li>Respect the intellectual property rights of others</li>
+                <li>We cannot guarantee the accuracy of information provided by third-party merchants.</li>
+                
+            </ul>
+            <p>Always verify product details on the seller's website before making a purchase.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>4. Third-Party Websites</h2>
+            <p>Our website contains links to third-party websites.</p>
+            <p>We are not responsible for:</p>
+            <ul>
+                <li>Products sold by third-party merchants</li>
+                <li>Shipping and delivery issues</li>
+                <li>Refunds and returns</li>
+                <li>Product warranties</li>
+                <li>Third-party website content or policies</li>
+                
+            </ul>
+            <p>Any purchase made through affiliate links is solely between you and the merchant.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>5. User Conduct</h2>
+            <p>By using this website, you agree not to:</p>
+            <ul>
+                <li>Use the website for unlawful purposes</li>
+                <li>Attempt to damage or disrupt the website</li>
+                <li>Copy or republish website content without permission</li>
+                <li>Misuse affiliate links or tracking systems</li>
+            </ul>
+            
+        </div>
+
+        <div class="legal-section">
+            <h2>6. Intellectual Property</h2>
+            <p>All content on this website, including text, graphics, logos, images, reviews, and design elements, is protected by copyright and intellectual property laws.</p>
+            <p>You may not reproduce, distribute, or reuse content without written permission.</p>
+            </div>
+
+        <div class="legal-section">
+            <h2>7. Disclaimer</h2>
+            <p>All content on this website is provided for informational purposes only.</p>
+            <p>We make no guarantees regarding:</p>
+            <ul>
+                <li>Product performance</li>
+                <li>Merchant reliability</li>
+                <li>Product availability</li>
+                <li>Earnings, savings, or results from recommended products</li>
+            </ul>
+            <p>Your use of the website is at your own risk.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>8. Limitation of Liability</h2>
+            <p>We shall not be held responsible for any direct or indirect losses, damages, or issues resulting from:</p>
+            <ul>
+                <li>Use of this website</li>
+                <li>Purchases made through affiliate links</li>
+                <li>Errors in product information</li>
+                <li>Third-party websites or services</li>
+            </ul>
+        </div>
+
+        <div class="legal-section">
+            <h2>9. Changes to These Terms</h2>
+            <p>We may update these Terms of Service at any time.</p>
+            <p>Any changes will be posted on this page along with the updated date.</p>
+            <p>Continued use of the website after updates constitutes acceptance of the revised terms.</p>
+            
+        </div>
+
+        <div class="legal-section">
+            <h2>10. Contact Information</h2>
+            <p>If you have questions regarding these Terms of Service, please contact us:</p>
+            <div class="contact-info">
+                <p><i class="fas fa-envelope"></i> <strong>Email:</strong> abbenhub@gmail.com</p>
+                
+            </div>
+        </div>
+
+        <div class="legal-consent">
+            <i class="fas fa-gavel"></i>
+            <p>By using our website, you acknowledge that you have read, understood, and agree to these Terms of Service.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Legal Pages Shared Styles */
+.legal-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.legal-header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.legal-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+}
+
+.legal-header p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.legal-subtitle {
+    font-size: 1rem;
+    color: #888;
+    margin-top: 10px;
+}
+
+.legal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.legal-section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.legal-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.legal-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legal-section h2:before {
+    content: "▸";
+    color: #1a1a1a;
+    font-size: 1.2rem;
+}
+
+.legal-section p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.legal-section ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 15px 0;
+}
+
+.legal-section ul li {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+}
+
+.legal-section ul li:before {
+    content: "•";
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 1.2rem;
+    position: absolute;
+    left: 5px;
+}
+
+.legal-section strong {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.contact-info {
+    background: #f8f8f8;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+}
+
+.contact-info p {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.contact-info i {
+    width: 25px;
+    color: #1a1a1a;
+    font-size: 1.1rem;
+}
+
+.legal-consent {
+    background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 40px;
+    border: 1px solid #e0e0e0;
+}
+
+.legal-consent i {
+    font-size: 3rem;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+}
+
+.legal-consent p {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .legal-container {
+        padding: 20px 15px;
+    }
+    
+    .legal-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .legal-header p {
+        font-size: 0.85rem;
+    }
+    
+    .legal-content {
+        padding: 20px;
+    }
+    
+    .legal-section h2 {
+        font-size: 1.3rem;
+    }
+    
+    .legal-section p,
+    .legal-section ul li {
+        font-size: 0.9rem;
+    }
+    
+    .contact-info p {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .legal-consent {
+        padding: 20px;
+    }
+    
+    .legal-consent i {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+
+
+
+

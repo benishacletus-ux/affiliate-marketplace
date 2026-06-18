@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - ABBEN HUB Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .admin-login-container {
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .login-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+        
+        .login-header h1 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .login-header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .input-group {
+            position: relative;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .back-to-site {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-to-site a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-to-site a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        .admin-badge {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .admin-badge span {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .demo-credentials {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .demo-credentials p {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .demo-credentials code {
+            display: block;
+            padding: 8px;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            color: #333;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 25px;
+            }
+            
+            .login-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .login-icon i {
+                font-size: 1.8rem;
+            }
+            
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1>Admin Login</h1>
+                <p>Enter your credentials to access the admin panel</p>
+            </div>
+            
+            <div class="admin-badge">
+                <span><i class="fas fa-lock"></i> Secure Admin Area</span>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="username" placeholder="Enter admin username" required autocomplete="off">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" placeholder="Enter password" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login to Admin Panel
+                </button>
+            </form>
+            
+            <div class="demo-credentials">
+                <p><i class="fas fa-info-circle"></i> Demo Admin Credentials:</p>
+                <code>Username: admin<br>Password: admin123</code>
+            </div>
+        </div>
+        
+        <div class="back-to-site">
+            <a href="http://127.0.0.1:5000/">
+                <i class="fas fa-arrow-left"></i> Back to Affiliate Site
+            </a>
+        </div>
+    </div>
+
+    <!-- Share Buttons -->
+    <div class="share-buttons">
+        <h4>Share this:</h4>
+        <div class="share-icons">
+            <a href="#" class="share-btn twitter" data-share="twitter" target="_blank" rel="noopener noreferrer" aria-label="Share on X"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" class="share-btn facebook" data-share="facebook" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="share-btn linkedin" data-share="linkedin" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#" class="share-btn whatsapp" data-share="whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="share-btn telegram" data-share="telegram" target="_blank" rel="noopener noreferrer" aria-label="Share on Telegram"><i class="fab fa-telegram-plane"></i></a>
+            <a href="#" class="share-btn email" data-share="email" aria-label="Share via Email"><i class="fas fa-envelope"></i></a>
+            <a href="#" class="share-btn copy" data-share="copy" aria-label="Copy link"><i class="fas fa-link"></i></a>
+        </div>
+    </div>
+    <style>.share-buttons{text-align:center;margin:30px 0;padding:20px;border-radius:16px;background:#f8f8f8;border:1px solid #eaeaea}.share-buttons h4{margin-bottom:15px;color:#1a1a1a;font-weight:600;font-size:1rem}.share-icons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.share-btn{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:all .3s ease;text-decoration:none;background:#fff;color:#333;border:1px solid #e0e0e0;font-size:1rem;cursor:pointer}.share-btn:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,.1)}.share-btn.twitter:hover{background:#000;color:#fff;border-color:#000}.share-btn.facebook:hover{background:#4267B2;color:#fff;border-color:#4267B2}.share-btn.linkedin:hover{background:#0077B5;color:#fff;border-color:#0077B5}.share-btn.whatsapp:hover{background:#25D366;color:#fff;border-color:#25D366}.share-btn.telegram:hover{background:#0088cc;color:#fff;border-color:#0088cc}.share-btn.email:hover{background:#ea580c;color:#fff;border-color:#ea580c}.share-btn.copy:hover{background:#1a1a1a;color:#fff;border-color:#1a1a1a}.copy-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:40px;font-size:.9rem;z-index:9999;opacity:0;transition:opacity .3s ease;box-shadow:0 4px 12px rgba(0,0,0,.2)}.copy-toast.show{opacity:1}@media(max-width:768px){.share-buttons{padding:15px;margin:20px 0}.share-btn{width:38px;height:38px;font-size:.85rem}.share-icons{gap:8px}}@media(max-width:480px){.share-btn{width:36px;height:36px;font-size:.8rem}}</style>
+    <script>document.addEventListener('DOMContentLoaded',function(){const e=document.querySelectorAll('.share-btn[data-share]'),t=encodeURIComponent(window.location.href),n=encodeURIComponent(document.querySelector('h1')?.textContent||document.title||'Check this out'),o={twitter:https://twitter.com/intent/tweet?url=&text=,facebook:https://www.facebook.com/sharer/sharer.php?u=,linkedin:https://www.linkedin.com/sharing/share-offsite/?url=,whatsapp:https://api.whatsapp.com/send?text=%20-%20,telegram:https://t.me/share/url?url=&text=,email:mailto:?subject=&body=Check out this,,,,,, article: ,copy:'copy'};e.forEach(e=>{e.addEventListener('click',function(e){e.preventDefault();const r=this.dataset.share;if(r==='copy'){const e=decodeURIComponent(t);navigator.clipboard.writeText(e).then(()=>{showToast('Link copied!')}).catch(()=>{const t=document.createElement('textarea');t.value=e,document.body.appendChild(t),t.select(),document.execCommand('copy'),document.body.removeChild(t),showToast('Link copied!')})}else r==='email'?window.location.href=o[r]:window.open(o[r],'_blank','width=600,height=500')})});function showToast(e){let t=document.querySelector('.copy-toast');t||(t=document.createElement('div'),t.className='copy-toast',document.body.appendChild(t)),t.textContent=e,t.classList.add('show'),setTimeout(()=>{t.classList.remove('show')},3e3)}});</script>
+    
+</html>
+
+
+
+

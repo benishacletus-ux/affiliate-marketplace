@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - Affiliate Marketplace{% endblock %}
+
+{% block content %}
+<div class="back-button-container">
+    <button onclick="window.history.back()" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Go Back
+    </button>
+</div>
+
+<div class="product-detail">
+    <div class="product-detail-header">
+        <div class="product-detail-image">
+            {% if product.image_file %}
+                <img src="{{ url_for('static', filename='uploads/products/' + product.image_file) }}" alt="{{ product.name }}" class="product-main-image">
+            {% elif product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-main-image">
+            {% else %}
+                <i class="{{ product.image_icon }} fa-5x"></i>
+            {% endif %}
+        </div>
+        <div class="product-detail-info">
+            <h1>{{ product.name }}</h1>
+            <div class="rating">
+                {% set full_stars = product.rating|int %}
+                {% set half_star = (product.rating - full_stars) >= 0.5 %}
+                {% for i in range(full_stars) %}
+                    <i class="fas fa-star"></i>
+                {% endfor %}
+                {% if half_star %}
+                    <i class="fas fa-star-half-alt"></i>
+                {% endif %}
+                {% for i in range(5 - full_stars - (1 if half_star else 0)) %}
+                    <i class="far fa-star"></i>
+                {% endfor %}
+                <span class="rating-count">({{ product.reviews_count }} reviews)</span>
+            </div>
+            <div class="product-price">₹{{ "%.2f"|format(product.price * 83) }}</div>
+            {% if product.original_price %}
+            <div class="original-price">Was: ₹{{ "%.2f"|format(product.original_price * 83) }}</div>
+            <div class="discount-badge">-{{ ((product.original_price - product.price) / product.original_price * 100)|int }}%</div>
+            {% endif %}
+            <p class="product-description">{{ product.description }}</p>
+            <a href="{{ product.affiliate_link }}" target="_blank" class="btn-primary buy-now" data-product-id="{{ product.id }}">
+                <i class="fas fa-shopping-cart"></i> Buy Now on Affiliate Store
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+            <div class="affiliate-disclaimer">
+                <i class="fas fa-info-circle"></i> As an affiliate, we earn from qualifying purchases.
+            </div>
+        </div>
+    </div>
+    
+    <div class="section-head">
+        <h2>Customer Reviews</h2>
+    </div>
+    <div class="reviews-list">
+        {% for review in reviews %}
+        <div class="review-card">
+            <div class="review-header">
+                <div class="reviewer-avatar">{{ review.user_avatar }}</div>
+                <div>
+                    <strong>{{ review.user_name }}</strong>
+                    <div class="rating">
+                        {% for i in range(review.rating) %}★{% endfor %}
+                        {% for i in range(5-review.rating) %}☆{% endfor %}
+                    </div>
+                </div>
+            </div>
+            <p class="review-comment">{{ review.comment }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="section-head">
+        <h2>Related Products</h2>
+    </div>
+    <div class="products-grid">
+        {% for rel in related %}
+        <a href="{{ url_for('product', slug=rel.slug) }}" class="product-card">
+            <div class="product-img">
+                {% if rel.image_file %}
+                    <img src="{{ url_for('static', filename='uploads/products/' + rel.image_file) }}" alt="{{ rel.name }}" class="related-product-image">
+                {% elif rel.image_url %}
+                    <img src="{{ rel.image_url }}" alt="{{ rel.name }}" class="related-product-image">
+                {% else %}
+                    <i class="{{ rel.image_icon }} fa-3x"></i>
+                {% endif %}
+            </div>
+            <div class="product-info">
+                <h3>{{ rel.name[:30] }}</h3>
+                <div class="product-price">₹{{ "%.2f"|format(rel.price * 83) }}</div>
+                <div class="affiliate-btn">View Deal <i class="fas fa-arrow-right"></i></div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+/* Back Button */
+.back-button-container {
+    margin-bottom: 25px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    color: #1a1a1a;
+    padding: 8px 18px;
+    border-radius: 40px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    border-color: #1a1a1a;
+    background: rgba(0,0,0,0.02);
+    transform: translateX(-3px);
+}
+
+/* Product Detail Header */
+.product-detail-header {
+    display: flex;
+    gap: 50px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+}
+
+.product-detail-image {
+    flex: 1;
+    text-align: center;
+    padding: 40px;
+    border-radius: 24px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-main-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 16px;
+}
+
+.product-detail-info {
+    flex: 1.5;
+}
+
+.product-detail-info h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #1a1a1a;
+}
+
+.rating {
+    color: #f5a623;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.rating-count {
+    color: #888;
+    font-size: 0.8rem;
+    margin-left: 5px;
+}
+
+.product-price {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin: 15px 0 5px;
+}
+
+.original-price {
+    font-size: 1rem;
+    text-decoration: line-through;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.discount-badge {
+    display: inline-block;
+    background: #ff4757;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.product-description {
+    margin: 20px 0;
+    line-height: 1.6;
+    color: #666;
+}
+
+.buy-now {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 14px 30px;
+    background: #1a1a1a;
+    color: white;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.buy-now:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+.affiliate-disclaimer {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Section Head */
+.section-head {
+    text-align: center;
+    margin: 50px 0 30px;
+}
+
+.section-head h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+/* Reviews */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.review-card {
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.review-header {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.reviewer-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: #1a1a1a;
+    color: white;
+}
+
+.review-comment {
+    color: #555;
+    line-height: 1.5;
+}
+
+/* Related Products */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.product-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    border-color: #1a1a1a;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.product-img {
+    height: 160px;
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.related-product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.product-img i {
+    font-size: 2.5rem;
+    color: #1a1a1a;
+}
+
+.product-info {
+    padding: 12px;
+    text-align: center;
+}
+
+.product-info h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #1a1a1a;
+}
+
+.product-info .product-price {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 5px 0;
+}
+
+.affiliate-btn {
+    background: #1a1a1a;
+    color: white;
+    text-align: center;
+    padding: 8px;
+    border-radius: 40px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: 8px;
+    transition: 0.2s;
+}
+
+.affiliate-btn:hover {
+    background: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .product-detail-header {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .product-detail-image {
+        min-height: 200px;
+        padding: 20px;
+    }
+    
+    .product-detail-info h1 {
+        font-size: 1.5rem;
+    }
+    
+    .product-price {
+        font-size: 1.5rem;
+    }
+    
+    .products-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Track affiliate click
+function trackAffiliateClick(productId) {
+    fetch('/api/click/' + productId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).catch(err => console.log('Tracking error:', err));
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Buy button tracking
+    const buyButton = document.querySelector('.buy-now');
+    if (buyButton) {
+        const productId = buyButton.getAttribute('data-product-id');
+        buyButton.addEventListener('click', function(e) {
+            if (productId) {
+                trackAffiliateClick(productId);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

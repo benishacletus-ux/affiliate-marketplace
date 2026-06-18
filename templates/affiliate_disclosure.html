@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Affiliate Disclosure - Affiliate Marketplace{% endblock %}
+
+{% block content %}
+<div class="legal-container">
+    <div class="legal-header">
+        <h1>Affiliate Disclosure</h1>
+        <p>Last updated: {{ "now"|datetime }}</p>
+        <p class="legal-subtitle">At ABBEN HUB, transparency and trust are important to us. This Affiliate Disclosure explains how affiliate links on our website work and how we may earn commissions.</p>
+    </div>
+
+    <div class="legal-content">
+        <div class="legal-section">
+            <h2>What Are Affiliate Links?</h2>
+            <p>Some of the links on ABBEN HUB are affiliate links. This means that if you click on a link and make a purchase, we may receive a commission from the retailer or service provider at no additional cost to you.
+
+The price you pay remains exactly the same whether you use our affiliate link or visit the website directly.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Our Commitment to Honest Recommendations</h2>
+            <p>Our goal is to help users discover valuable products, services, software, and tools.</p>
+            <p>We only recommend products that we believe can provide value to our readers. Affiliate partnerships do not influence our opinions, reviews, or recommendations.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>How Affiliate Marketing Supports ABBEN HUB</h2>
+            <p>Affiliate commissions help us:</p>
+            <ul>
+                <li>Maintain and improve our website</li>
+                <li>Create detailed reviews and buying guides</li>
+                <li>Research and compare products</li>
+                <li>Publish free content for our readers</li>
+                <li><strong>You pay the exact same price</strong> as going directly to the merchant</li>
+                <li>Continue growing and improving ABBEN HUB</li>
+            </ul>
+            <p>This model allows us to provide high-quality content, product research, and recommendations completely free to our users.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Affiliate Programs We Participate In</h2>
+            <p>ABBEN HUB may participate in various affiliate programs, including:</p>
+            <ul>
+                <li>Amazon Associates</li>
+                <li>ShareASale</li>
+                <li>CJ Affiliate</li>
+                <li>Impact</li> 
+                <li>PartnerStack</li>
+                <li>Individual Brand Affiliate Programs</li>
+            </ul>
+            <p>Additional affiliate partnerships may be added as our website grows.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Editorial Independence</h2>
+            <p>Our content is created independently, and affiliate commissions do not determine which products we recommend.</p>
+            <p>We aim to provide accurate, unbiased, and helpful information to assist readers in making informed purchasing decisions.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>No Additional Cost To You</h2>
+            <p>Using our affiliate links does not increase the price of any product or service.</p>
+            <p>In many cases, affiliate links may even provide access to special discounts, offers, or promotions.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Your Responsibility</h2>
+            <p>Before purchasing any product or service, we encourage users to conduct their own research and verify product details directly with the seller or provider.</p>
+            <p>ABBEN HUB is not responsible for changes in pricing, product availability, warranties, or policies offered by third-party websites.</p>
+        </div>
+
+        <div class="legal-section">
+            <h2>Questions About Affiliate Links?</h2>
+            <p>If you have any questions regarding this Affiliate Disclosure or our affiliate relationships, please contact us:</p>
+            <div class="contact-info">
+                <p><i class="fas fa-envelope"></i> <strong>Email:</strong> abbenhub@gmail.com</p>
+                <p><i class="fas fa-comment"></i> <strong>Contact Form:</strong> Available on our Contact Us page</p>
+                <p><i class="fas fa-clock"></i> <strong>Response Time:</strong> We typically respond within 24-48 hours</p>
+            </div>
+        </div>
+
+        <div class="legal-section">
+            <h2>Affiliate Program Application</h2>
+            <p>Are you a merchant or brand interested in partnering with us? We're always looking for quality products and services to share with our audience. Please contact our partnerships team at <strong>partners@affiliatemarketplace.com</strong> to discuss collaboration opportunities.</p>
+        </div>
+
+        <div class="legal-consent">
+            <i class="fas fa-heart"></i>
+            <p><strong>Thank you for supporting ABBEN HUB.</strong> Your support helps us continue creating valuable content, product reviews, comparisons, and buying guides for our readers. ❤️</p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Legal Pages Shared Styles */
+.legal-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.legal-header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.legal-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+}
+
+.legal-header p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.legal-subtitle {
+    font-size: 1rem;
+    color: #888;
+    margin-top: 10px;
+}
+
+.legal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.legal-section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.legal-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.legal-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.legal-section h2:before {
+    content: "▸";
+    color: #1a1a1a;
+    font-size: 1.2rem;
+}
+
+.legal-section p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.legal-section ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 15px 0;
+}
+
+.legal-section ul li {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+}
+
+.legal-section ul li:before {
+    content: "✓";
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 1rem;
+    position: absolute;
+    left: 5px;
+}
+
+.legal-section strong {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.contact-info {
+    background: #f8f8f8;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+}
+
+.contact-info p {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.contact-info i {
+    width: 25px;
+    color: #1a1a1a;
+    font-size: 1.1rem;
+}
+
+.legal-consent {
+    background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 40px;
+    border: 1px solid #e0e0e0;
+}
+
+.legal-consent i {
+    font-size: 3rem;
+    color: #ff4757;
+    margin-bottom: 15px;
+}
+
+.legal-consent p {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .legal-container {
+        padding: 20px 15px;
+    }
+    
+    .legal-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .legal-header p {
+        font-size: 0.85rem;
+    }
+    
+    .legal-content {
+        padding: 20px;
+    }
+    
+    .legal-section h2 {
+        font-size: 1.3rem;
+    }
+    
+    .legal-section p,
+    .legal-section ul li {
+        font-size: 0.9rem;
+    }
+    
+    .contact-info p {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .legal-consent {
+        padding: 20px;
+    }
+    
+    .legal-consent i {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+
+
+
+

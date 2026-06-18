@@ -1,0 +1,652 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Manage Blog Posts - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1><i class="fas fa-newspaper"></i> Manage Blog Posts</h1>
+        <a href="{{ url_for('admin_add_blog') }}" class="btn-primary">
+            <i class="fas fa-plus"></i> Add New Post
+        </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search by title, category, or author...">
+        </div>
+        <div class="filter-options">
+            <select id="filterStatus">
+                <option value="all">All Posts</option>
+                <option value="published">Published</option>
+                <option value="draft">Drafts</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="admin-table-full" id="blogTable">
+            <thead>
+                <tr>
+                    <th width="50">ID</th>
+                    <th width="80">Image</th>
+                    <th>Title</th>
+                    <th width="120">Category</th>
+                    <th width="120">Author</th>
+                    <th width="60">Views</th>
+                    <th width="90">Status</th>
+                    <th width="110">Date</th>
+                    <th width="170">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts.items %}
+                <tr data-post-id="{{ post.id }}" 
+                    data-title="{{ post.title|lower }}" 
+                    data-category="{{ post.category|lower }}" 
+                    data-author="{{ post.author|lower }}"
+                    data-status="{% if post.is_published %}published{% else %}draft{% endif %}">
+                    <td class="text-center">{{ post.id }}</td>
+                    <td class="image-cell">
+                        {% if post.image_file %}
+                            <img src="{{ url_for('static', filename='uploads/blog/' + post.image_file) }}" alt="{{ post.title }}" class="post-thumbnail">
+                        {% elif post.image_url %}
+                            <img src="{{ post.image_url }}" alt="{{ post.title }}" class="post-thumbnail">
+                        {% else %}
+                            <i class="{{ post.image_icon if post.image_icon else 'fas fa-file-alt' }} fa-2x"></i>
+                        {% endif %}
+                    </td>
+                    <td class="title-cell">
+                        <strong>{{ post.title[:60] }}</strong>
+                        {% if post.title|length > 60 %}...{% endif %}
+                        <div class="post-slug"><i class="fas fa-link"></i> /blog/{{ post.slug }}</div>
+                    </td>
+                    <td><span class="category-badge">{{ post.category }}</span></td>
+                    <td>{{ post.author or 'Admin' }}</td>
+                    <td class="text-center">{{ post.views }}</td>
+                    <td>
+                        {% if post.is_published %}
+                            <span class="status-badge published"><i class="fas fa-check-circle"></i> Published</span>
+                        {% else %}
+                            <span class="status-badge draft"><i class="fas fa-pencil-alt"></i> Draft</span>
+                        {% endif %}
+                    </td>
+                    <td class="date-cell">{{ post.created_at.strftime('%Y-%m-%d') if post.created_at else 'N/A' }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('admin_edit_blog', id=post.id) }}" class="btn-edit">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <button class="btn-delete" data-id="{{ post.id }}" data-title="{{ post.title }}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="no-posts">
+                        <i class="fas fa-blog fa-3x"></i>
+                        <p>No blog posts found.</p>
+                        <a href="{{ url_for('admin_add_blog') }}" class="btn-primary">
+                            <i class="fas fa-plus"></i> Create Your First Post
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination and pagination.pages > 1 %}
+    <div class="pagination">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('admin_blog', page=pagination.prev_num) }}" class="page-btn">← Previous</a>
+        {% endif %}
+        
+        {% for page_num in pagination.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+            {% if page_num %}
+                {% if page_num == pagination.page %}
+                <span class="page-btn active">{{ page_num }}</span>
+                {% else %}
+                <a href="{{ url_for('admin_blog', page=page_num) }}" class="page-btn">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+                <span class="page-dots">...</span>
+            {% endif %}
+        {% endfor %}
+        
+        {% if pagination.has_next %}
+        <a href="{{ url_for('admin_blog', page=pagination.next_num) }}" class="page-btn">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.admin-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.admin-header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1a1a1a;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #1a1a1a;
+    color: white;
+    border-radius: 40px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #333;
+    transform: translateY(-2px);
+}
+
+/* Search Section */
+.search-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #e0e0e0;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    background: #ffffff;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+}
+
+.filter-options select {
+    padding: 11px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.filter-options select:focus {
+    outline: none;
+    border-color: #1a1a1a;
+}
+
+/* Table Styles */
+.table-responsive {
+    overflow-x: auto;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
+}
+
+.admin-table-full {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.admin-table-full th,
+.admin-table-full td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.admin-table-full th {
+    font-weight: 600;
+    background: #f8f9fa;
+    color: #1a1a1a;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-table-full tr:hover {
+    background: #fafafa;
+}
+
+.admin-table-full tr:last-child td {
+    border-bottom: none;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Image Cell */
+.image-cell {
+    text-align: center;
+    padding: 8px 12px;
+}
+
+.post-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.image-cell i {
+    opacity: 0.6;
+    color: #1a1a1a;
+    font-size: 1.5rem;
+}
+
+/* Title Cell */
+.title-cell strong {
+    color: #1a1a1a;
+}
+
+.post-slug {
+    font-size: 0.7rem;
+    color: #888;
+    margin-top: 2px;
+}
+
+.post-slug i {
+    margin-right: 4px;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.status-badge.published {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-badge.draft {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+/* Category Badge */
+.category-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #f0f0f0;
+    color: #1a1a1a;
+}
+
+.date-cell {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+/* Action Buttons */
+.actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn-edit, .btn-delete {
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+}
+
+.btn-edit {
+    background: #4CAF50;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #45a049;
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    background: #f44336;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+}
+
+/* No Posts Row */
+.no-posts {
+    text-align: center;
+    padding: 60px 20px;
+    color: #888;
+}
+
+.no-posts i {
+    color: #ddd;
+    margin-bottom: 15px;
+}
+
+.no-posts p {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}
+
+.no-posts .btn-primary {
+    display: inline-flex;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.page-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid #e0e0e0;
+    font-weight: 500;
+}
+
+.page-btn.active {
+    background: #1a1a1a;
+    color: #ffffff;
+    border-color: #1a1a1a;
+}
+
+.page-btn:hover:not(.active) {
+    border-color: #1a1a1a;
+    transform: translateY(-2px);
+}
+
+.page-dots {
+    padding: 8px 5px;
+    color: #888;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+    
+    .admin-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .search-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        max-width: 100%;
+    }
+    
+    .filter-options select {
+        width: 100%;
+    }
+    
+    .actions {
+        flex-direction: column;
+    }
+    
+    .btn-edit, .btn-delete {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .pagination {
+        gap: 5px;
+    }
+    
+    .page-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .post-thumbnail {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .admin-table-full th,
+    .admin-table-full td {
+        padding: 10px 8px;
+        font-size: 0.8rem;
+    }
+    
+    .category-badge {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+    }
+    
+    .status-badge {
+        font-size: 0.6rem;
+        padding: 3px 8px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== DELETE BLOG POST ==========
+    var deleteButtons = document.querySelectorAll('.btn-delete');
+    
+    deleteButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var postId = this.getAttribute('data-id');
+            var postTitle = this.getAttribute('data-title');
+            
+            if (confirm('Delete blog post "' + postTitle + '"? This action cannot be undone.')) {
+                // Show loading state
+                var originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                this.disabled = true;
+                
+                var deleteUrl = '/admin-panel/blog/delete/' + postId;
+                
+                console.log('Deleting blog post at:', deleteUrl);
+                
+                fetch(deleteUrl, { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(function(response) {
+                    console.log('Response status:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error('Server returned ' + response.status);
+                    }
+                    
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        // Remove the row with animation
+                        var row = button.closest('tr');
+                        if (row) {
+                            row.style.transition = 'all 0.3s ease';
+                            row.style.opacity = '0';
+                            row.style.transform = 'translateX(-20px)';
+                            setTimeout(function() {
+                                row.remove();
+                                // Check if table is empty
+                                var remainingRows = document.querySelectorAll('#blogTable tbody tr');
+                                if (remainingRows.length === 1 && remainingRows[0].classList.contains('no-posts')) {
+                                    // Already showing no posts
+                                } else if (remainingRows.length === 0) {
+                                    window.location.reload();
+                                }
+                            }, 300);
+                        }
+                        alert('Blog post "' + postTitle + '" deleted successfully!');
+                    } else {
+                        alert(data.error || 'Error deleting blog post. Please try again.');
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error:', error);
+                    alert('Error deleting blog post: ' + error.message);
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                });
+            }
+        });
+    });
+    
+    // ========== SEARCH FUNCTIONALITY ==========
+    var searchInput = document.getElementById('searchInput');
+    var filterStatus = document.getElementById('filterStatus');
+    var tableRows = document.querySelectorAll('#blogTable tbody tr');
+    
+    function filterTable() {
+        var searchTerm = searchInput.value.toLowerCase().trim();
+        var statusFilter = filterStatus.value;
+        var visibleCount = 0;
+        
+        tableRows.forEach(function(row) {
+            // Skip the no-posts row
+            if (row.classList.contains('no-posts')) return;
+            
+            var title = row.getAttribute('data-title') || '';
+            var category = row.getAttribute('data-category') || '';
+            var author = row.getAttribute('data-author') || '';
+            var status = row.getAttribute('data-status') || 'published';
+            
+            var matchesSearch = title.includes(searchTerm) || 
+                               category.includes(searchTerm) || 
+                               author.includes(searchTerm) || 
+                               searchTerm === '';
+            
+            var matchesStatus = statusFilter === 'all' || status === statusFilter;
+            
+            if (matchesSearch && matchesStatus) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Show/hide no results message
+        var noResultsDiv = document.querySelector('.no-results');
+        if (visibleCount === 0 && (searchTerm !== '' || statusFilter !== 'all')) {
+            if (!noResultsDiv) {
+                noResultsDiv = document.createElement('tr');
+                noResultsDiv.className = 'no-results';
+                noResultsDiv.innerHTML = `
+                    <td colspan="9" style="text-align:center;padding:40px;color:#888;">
+                        <i class="fas fa-search fa-2x" style="display:block;margin-bottom:10px;color:#ddd;"></i>
+                        <p>No blog posts found matching your search.</p>
+                        <button onclick="document.getElementById('searchInput').value='';document.getElementById('filterStatus').value='all';filterTable();" 
+                                style="padding:8px 20px;border:1px solid #e0e0e0;border-radius:20px;background:transparent;cursor:pointer;">
+                            Clear Filters
+                        </button>
+                    </td>
+                `;
+                var tbody = document.querySelector('#blogTable tbody');
+                if (tbody) tbody.appendChild(noResultsDiv);
+            }
+            noResultsDiv.style.display = '';
+        } else if (noResultsDiv) {
+            noResultsDiv.style.display = 'none';
+        }
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', filterTable);
+    }
+    
+    if (filterStatus) {
+        filterStatus.addEventListener('change', filterTable);
+    }
+    
+    // Make filterTable available globally for the clear button
+    window.filterTable = filterTable;
+});
+</script>
+{% endblock %}
