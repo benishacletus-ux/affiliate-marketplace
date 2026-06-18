@@ -4,16 +4,300 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
-    <title>{% block title %}Admin Panel - Affiliate Marketplace{% endblock %}</title>
+    <title>{% block title %}Admin Panel{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+        }
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        .admin-sidebar {
+            width: 260px;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px 0;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .admin-logo {
+            padding: 0 20px 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .admin-logo .highlight {
+            color: #f5a623;
+        }
+        .admin-badge {
+            background: #f5a623;
+            color: #1a1a1a;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+        .admin-nav {
+            padding: 20px 0;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+        }
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-left: 3px solid #f5a623;
+        }
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        .admin-sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            padding: 10px 0;
+        }
+        .logout-btn:hover {
+            color: #fff;
+        }
+        .admin-main {
+            margin-left: 260px;
+            padding: 20px 30px;
+            flex: 1;
+            width: 100%;
+        }
+        .admin-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #1a1a1a;
+        }
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555;
+        }
+        .admin-user i {
+            font-size: 1.5rem;
+            color: #1a1a1a;
+        }
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .admin-content {
+            padding: 10px 0;
+        }
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: 0.3s;
+            }
+            .admin-sidebar.open {
+                transform: translateX(0);
+            }
+            .admin-main {
+                margin-left: 0;
+                padding: 15px;
+            }
+            .sidebar-toggle {
+                display: block;
+            }
+            .admin-sidebar-footer {
+                position: relative;
+                margin-top: 20px;
+            }
+        }
+        /* Share buttons styles */
+        .share-buttons {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 16px;
+            background: #f8f8f8;
+            border: 1px solid #eaeaea;
+        }
+        .share-buttons h4 {
+            margin-bottom: 15px;
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .share-icons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .share-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .3s ease;
+            text-decoration: none;
+            background: #fff;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,.1);
+        }
+        .share-btn.twitter:hover {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+        }
+        .share-btn.facebook:hover {
+            background: #4267B2;
+            color: #fff;
+            border-color: #4267B2;
+        }
+        .share-btn.linkedin:hover {
+            background: #0077B5;
+            color: #fff;
+            border-color: #0077B5;
+        }
+        .share-btn.whatsapp:hover {
+            background: #25D366;
+            color: #fff;
+            border-color: #25D366;
+        }
+        .share-btn.telegram:hover {
+            background: #0088cc;
+            color: #fff;
+            border-color: #0088cc;
+        }
+        .share-btn.email:hover {
+            background: #ea580c;
+            color: #fff;
+            border-color: #ea580c;
+        }
+        .share-btn.copy:hover {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
+        }
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: .9rem;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity .3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,.2);
+        }
+        .copy-toast.show {
+            opacity: 1;
+        }
+        @media(max-width:768px) {
+            .share-buttons {
+                padding: 15px;
+                margin: 20px 0;
+            }
+            .share-btn {
+                width: 38px;
+                height: 38px;
+                font-size: .85rem;
+            }
+            .share-icons {
+                gap: 8px;
+            }
+        }
+        @media(max-width:480px) {
+            .share-btn {
+                width: 36px;
+                height: 36px;
+                font-size: .8rem;
+            }
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body class="admin-body">
     <div class="admin-wrapper">
-        <!-- Sidebar Navigation -->
-        <aside class="admin-sidebar">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
             <div class="admin-logo">
                 <i class="fas fa-store"></i>
                 <span>ABBEN<span class="highlight">HUB</span></span>
@@ -21,61 +305,57 @@
             </div>
             
             <nav class="admin-nav">
-                <a href="{{ url_for('admin_dashboard') }}" class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                <a href="/admin-panel" class="nav-item">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ url_for('admin_products') }}" class="nav-item {% if request.endpoint == 'admin_products' %}active{% endif %}">
+                <a href="/admin-panel/products" class="nav-item">
                     <i class="fas fa-box"></i>
                     <span>Products</span>
                 </a>
-                <a href="{{ url_for('admin_categories') }}" class="nav-item {% if request.endpoint == 'admin_categories' %}active{% endif %}">
+                <a href="/admin-panel/categories" class="nav-item">
                     <i class="fas fa-tags"></i>
                     <span>Categories</span>
                 </a>
-                <a href="{{ url_for('admin_blog') }}" class="nav-item {% if request.endpoint == 'admin_blog' %}active{% endif %}">
+                <a href="/admin-panel/blog" class="nav-item">
                     <i class="fas fa-newspaper"></i>
                     <span>Blog Posts</span>
                 </a>
-                <a href="{{ url_for('admin_users') }}" class="nav-item {% if request.endpoint == 'admin_users' %}active{% endif %}">
+                <a href="/admin-panel/users" class="nav-item">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
-                <a href="{{ url_for('admin_reviews') }}" class="nav-item {% if request.endpoint == 'admin_reviews' %}active{% endif %}">
+                <a href="/admin-panel/reviews" class="nav-item">
                     <i class="fas fa-star"></i>
                     <span>Reviews</span>
                 </a>
-                <!-- ORDERS LINK REMOVED - DO NOT ADD BACK UNTIL ROUTE EXISTS -->
-                <a href="{{ url_for('admin_settings') }}" class="nav-item {% if request.endpoint == 'admin_settings' %}active{% endif %}">
+                <a href="/admin-panel/settings" class="nav-item">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>
             </nav>
             
             <div class="admin-sidebar-footer">
-                <a href="{{ url_for('admin_logout') }}" class="logout-btn">
+                <a href="/admin-panel/logout" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
-                <a href="{{ url_for('index') }}" class="logout-btn" target="_blank" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
+                <a href="/" class="logout-btn" target="_blank" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
                     <i class="fas fa-external-link-alt"></i>
                     <span>View Site</span>
                 </a>
             </div>
         </aside>
         
-        <!-- Main Content Area -->
+        <!-- Main Content -->
         <main class="admin-main">
-            <!-- Top Header -->
             <div class="admin-topbar">
                 <button class="sidebar-toggle" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <div class="admin-topbar-right">
-                    <div class="admin-user">
-                        <i class="fas fa-user-circle"></i>
-                        <span>Admin User</span>
-                    </div>
+                <div class="admin-user">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin User</span>
                 </div>
             </div>
             
@@ -98,9 +378,6 @@
         </main>
     </div>
     
-    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-    {% block extra_js %}{% endblock %}
-
     <!-- Share Buttons -->
     <div class="share-buttons">
         <h4>Share this:</h4>
@@ -115,39 +392,14 @@
         </div>
     </div>
     
-    <style>
-        .share-buttons{text-align:center;margin:30px 0;padding:20px;border-radius:16px;background:#f8f8f8;border:1px solid #eaeaea}
-        .share-buttons h4{margin-bottom:15px;color:#1a1a1a;font-weight:600;font-size:1rem}
-        .share-icons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
-        .share-btn{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:all .3s ease;text-decoration:none;background:#fff;color:#333;border:1px solid #e0e0e0;font-size:1rem;cursor:pointer}
-        .share-btn:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
-        .share-btn.twitter:hover{background:#000;color:#fff;border-color:#000}
-        .share-btn.facebook:hover{background:#4267B2;color:#fff;border-color:#4267B2}
-        .share-btn.linkedin:hover{background:#0077B5;color:#fff;border-color:#0077B5}
-        .share-btn.whatsapp:hover{background:#25D366;color:#fff;border-color:#25D366}
-        .share-btn.telegram:hover{background:#0088cc;color:#fff;border-color:#0088cc}
-        .share-btn.email:hover{background:#ea580c;color:#fff;border-color:#ea580c}
-        .share-btn.copy:hover{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
-        .copy-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:40px;font-size:.9rem;z-index:9999;opacity:0;transition:opacity .3s ease;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-        .copy-toast.show{opacity:1}
-        
-        /* Sidebar active state */
-        .nav-item.active {
-            background: rgba(255,255,255,0.15);
-            border-left: 3px solid #f5a623;
-        }
-        
-        @media(max-width:768px){.share-buttons{padding:15px;margin:20px 0}.share-btn{width:38px;height:38px;font-size:.85rem}.share-icons{gap:8px}}
-        @media(max-width:480px){.share-btn{width:36px;height:36px;font-size:.8rem}}
-    </style>
-    
     <script>
-        document.addEventListener('DOMContentLoaded',function(){
-            // Sidebar toggle for mobile
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebar = document.querySelector('.admin-sidebar');
-            if(sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar toggle
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('adminSidebar');
+            
+            if (toggleBtn && sidebar) {
+                toggleBtn.addEventListener('click', function() {
                     sidebar.classList.toggle('open');
                 });
             }
@@ -155,7 +407,7 @@
             // Close sidebar on outside click (mobile)
             document.addEventListener('click', function(e) {
                 if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains('open')) {
-                    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
                         sidebar.classList.remove('open');
                     }
                 }
@@ -176,15 +428,15 @@
                 copy: 'copy'
             };
             
-            shareBtns.forEach(function(btn){
-                btn.addEventListener('click', function(e){
+            shareBtns.forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     const type = this.dataset.share;
-                    if(type === 'copy'){
+                    if (type === 'copy') {
                         const copyUrl = decodeURIComponent(url);
-                        navigator.clipboard.writeText(copyUrl).then(function(){
+                        navigator.clipboard.writeText(copyUrl).then(function() {
                             showToast('Link copied!');
-                        }).catch(function(){
+                        }).catch(function() {
                             const input = document.createElement('textarea');
                             input.value = copyUrl;
                             document.body.appendChild(input);
@@ -199,20 +451,22 @@
                 });
             });
             
-            function showToast(msg){
+            function showToast(msg) {
                 let toast = document.querySelector('.copy-toast');
-                if(!toast){
+                if (!toast) {
                     toast = document.createElement('div');
                     toast.className = 'copy-toast';
                     document.body.appendChild(toast);
                 }
                 toast.textContent = msg;
                 toast.classList.add('show');
-                setTimeout(function(){
+                setTimeout(function() {
                     toast.classList.remove('show');
                 }, 3000);
             }
         });
     </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
