@@ -77,24 +77,12 @@ def format_datetime(value, format='%B %d, %Y'):
         return datetime.now().strftime(format)
     return value.strftime(format) if value else ""
 
-# ==================== CONTEXT PROCESSOR ====================
-
-@app.context_processor
-def inject_categories():
-    """Make categories and request available in all templates"""
-    try:
-        categories = Category.query.order_by(Category.display_order).all()
-        return dict(all_categories=categories, request=request)
-    except Exception as e:
-        print(f"⚠️ Error loading categories: {e}")
-        return dict(all_categories=[], request=request)
-
-# ==================== DATABASE INITIALIZATION ====================
+# ==================== DATABASE INITIALIZATION - RUNS IMMEDIATELY ====================
 
 def init_database():
     """Initialize database tables and create default data"""
-    with app.app_context():
-        try:
+    try:
+        with app.app_context():
             # Create all tables
             db.create_all()
             print("✅ Database tables created successfully!")
@@ -129,9 +117,23 @@ def init_database():
                 print(f"✅ Created {len(categories)} categories")
             
             return True
-        except Exception as e:
-            print(f"❌ Error initializing database: {e}")
-            return False
+    except Exception as e:
+        print(f"❌ Error initializing database: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+# ==================== CONTEXT PROCESSOR ====================
+
+@app.context_processor
+def inject_categories():
+    """Make categories and request available in all templates"""
+    try:
+        categories = Category.query.order_by(Category.display_order).all()
+        return dict(all_categories=categories, request=request)
+    except Exception as e:
+        print(f"⚠️ Error loading categories: {e}")
+        return dict(all_categories=[], request=request)
 
 # ==================== SAMPLE DATA INITIALIZATION ====================
 
@@ -927,13 +929,19 @@ def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
 
+# ==================== RUN INITIALIZATION BEFORE APP START ====================
+
+# This runs immediately when the file is imported
+with app.app_context():
+    print("🔧 Initializing database...")
+    init_database()
+    print("✅ Database initialization complete!")
+
 # ==================== RUN APP ====================
 
 if __name__ == '__main__':
     with app.app_context():
-        # Initialize database
-        init_database()
-        # Create sample data
+        # Create sample data if needed
         init_sample_data()
     
     print("=" * 50)
