@@ -45,11 +45,7 @@
                     <i class="fas fa-star"></i>
                     <span>Reviews</span>
                 </a>
-                <!-- Orders link removed - coming soon -->
-                <!-- <a href="{{ url_for('admin_orders') }}" class="nav-item">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span>Orders</span>
-                </a> -->
+                <!-- ORDERS LINK REMOVED - DO NOT ADD BACK UNTIL ROUTE EXISTS -->
                 <a href="{{ url_for('admin_settings') }}" class="nav-item {% if request.endpoint == 'admin_settings' %}active{% endif %}">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
@@ -155,6 +151,15 @@
                     sidebar.classList.toggle('open');
                 });
             }
+            
+            // Close sidebar on outside click (mobile)
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains('open')) {
+                    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                        sidebar.classList.remove('open');
+                    }
+                }
+            });
             
             // Share buttons
             const shareBtns = document.querySelectorAll('.share-btn[data-share]');
