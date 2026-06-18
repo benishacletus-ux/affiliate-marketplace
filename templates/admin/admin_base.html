@@ -21,44 +21,49 @@
             </div>
             
             <nav class="admin-nav">
-                <a href="/" class="nav-item">
+                <!-- ✅ FIXED: Added /admin-panel/ prefix to all links -->
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="/products" class="nav-item">
+                <a href="{{ url_for('admin_products') }}" class="nav-item {% if request.endpoint == 'admin_products' %}active{% endif %}">
                     <i class="fas fa-box"></i>
                     <span>Products</span>
                 </a>
-                <a href="/categories" class="nav-item">
+                <a href="{{ url_for('admin_categories') }}" class="nav-item {% if request.endpoint == 'admin_categories' %}active{% endif %}">
                     <i class="fas fa-tags"></i>
                     <span>Categories</span>
                 </a>
-                <a href="/blog" class="nav-item">
+                <a href="{{ url_for('admin_blog') }}" class="nav-item {% if request.endpoint == 'admin_blog' %}active{% endif %}">
                     <i class="fas fa-newspaper"></i>
                     <span>Blog Posts</span>
                 </a>
-                <a href="/users" class="nav-item">
+                <a href="{{ url_for('admin_users') }}" class="nav-item {% if request.endpoint == 'admin_users' %}active{% endif %}">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
-                <a href="/reviews" class="nav-item">
+                <a href="{{ url_for('admin_reviews') }}" class="nav-item {% if request.endpoint == 'admin_reviews' %}active{% endif %}">
                     <i class="fas fa-star"></i>
                     <span>Reviews</span>
                 </a>
-                <a href="/orders" class="nav-item">
+                <a href="{{ url_for('admin_orders') }}" class="nav-item {% if request.endpoint == 'admin_orders' %}active{% endif %}">
                     <i class="fas fa-shopping-cart"></i>
                     <span>Orders</span>
                 </a>
-                <a href="/settings" class="nav-item">
+                <a href="{{ url_for('admin_settings') }}" class="nav-item {% if request.endpoint == 'admin_settings' %}active{% endif %}">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
                 </a>
             </nav>
             
             <div class="admin-sidebar-footer">
-                <a href="/logout" class="logout-btn">
+                <a href="{{ url_for('admin_logout') }}" class="logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
+                </a>
+                <a href="{{ url_for('index') }}" class="logout-btn" target="_blank" style="margin-top:8px;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span>View Site</span>
                 </a>
             </div>
         </aside>
@@ -113,11 +118,94 @@
             <a href="#" class="share-btn copy" data-share="copy" aria-label="Copy link"><i class="fas fa-link"></i></a>
         </div>
     </div>
-    <style>.share-buttons{text-align:center;margin:30px 0;padding:20px;border-radius:16px;background:#f8f8f8;border:1px solid #eaeaea}.share-buttons h4{margin-bottom:15px;color:#1a1a1a;font-weight:600;font-size:1rem}.share-icons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.share-btn{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:all .3s ease;text-decoration:none;background:#fff;color:#333;border:1px solid #e0e0e0;font-size:1rem;cursor:pointer}.share-btn:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,.1)}.share-btn.twitter:hover{background:#000;color:#fff;border-color:#000}.share-btn.facebook:hover{background:#4267B2;color:#fff;border-color:#4267B2}.share-btn.linkedin:hover{background:#0077B5;color:#fff;border-color:#0077B5}.share-btn.whatsapp:hover{background:#25D366;color:#fff;border-color:#25D366}.share-btn.telegram:hover{background:#0088cc;color:#fff;border-color:#0088cc}.share-btn.email:hover{background:#ea580c;color:#fff;border-color:#ea580c}.share-btn.copy:hover{background:#1a1a1a;color:#fff;border-color:#1a1a1a}.copy-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:40px;font-size:.9rem;z-index:9999;opacity:0;transition:opacity .3s ease;box-shadow:0 4px 12px rgba(0,0,0,.2)}.copy-toast.show{opacity:1}@media(max-width:768px){.share-buttons{padding:15px;margin:20px 0}.share-btn{width:38px;height:38px;font-size:.85rem}.share-icons{gap:8px}}@media(max-width:480px){.share-btn{width:36px;height:36px;font-size:.8rem}}</style>
-    <script>document.addEventListener('DOMContentLoaded',function(){const e=document.querySelectorAll('.share-btn[data-share]'),t=encodeURIComponent(window.location.href),n=encodeURIComponent(document.querySelector('h1')?.textContent||document.title||'Check this out'),o={twitter:https://twitter.com/intent/tweet?url=&text=,facebook:https://www.facebook.com/sharer/sharer.php?u=,linkedin:https://www.linkedin.com/sharing/share-offsite/?url=,whatsapp:https://api.whatsapp.com/send?text=%20-%20,telegram:https://t.me/share/url?url=&text=,email:mailto:?subject=&body=Check out this,,,,,, article: ,copy:'copy'};e.forEach(e=>{e.addEventListener('click',function(e){e.preventDefault();const r=this.dataset.share;if(r==='copy'){const e=decodeURIComponent(t);navigator.clipboard.writeText(e).then(()=>{showToast('Link copied!')}).catch(()=>{const t=document.createElement('textarea');t.value=e,document.body.appendChild(t),t.select(),document.execCommand('copy'),document.body.removeChild(t),showToast('Link copied!')})}else r==='email'?window.location.href=o[r]:window.open(o[r],'_blank','width=600,height=500')})});function showToast(e){let t=document.querySelector('.copy-toast');t||(t=document.createElement('div'),t.className='copy-toast',document.body.appendChild(t)),t.textContent=e,t.classList.add('show'),setTimeout(()=>{t.classList.remove('show')},3e3)}});</script>
     
+    <style>
+        .share-buttons{text-align:center;margin:30px 0;padding:20px;border-radius:16px;background:#f8f8f8;border:1px solid #eaeaea}
+        .share-buttons h4{margin-bottom:15px;color:#1a1a1a;font-weight:600;font-size:1rem}
+        .share-icons{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+        .share-btn{width:42px;height:42px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;transition:all .3s ease;text-decoration:none;background:#fff;color:#333;border:1px solid #e0e0e0;font-size:1rem;cursor:pointer}
+        .share-btn:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+        .share-btn.twitter:hover{background:#000;color:#fff;border-color:#000}
+        .share-btn.facebook:hover{background:#4267B2;color:#fff;border-color:#4267B2}
+        .share-btn.linkedin:hover{background:#0077B5;color:#fff;border-color:#0077B5}
+        .share-btn.whatsapp:hover{background:#25D366;color:#fff;border-color:#25D366}
+        .share-btn.telegram:hover{background:#0088cc;color:#fff;border-color:#0088cc}
+        .share-btn.email:hover{background:#ea580c;color:#fff;border-color:#ea580c}
+        .share-btn.copy:hover{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+        .copy-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:12px 24px;border-radius:40px;font-size:.9rem;z-index:9999;opacity:0;transition:opacity .3s ease;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+        .copy-toast.show{opacity:1}
+        
+        /* Sidebar active state */
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            border-left: 3px solid #fff;
+        }
+        
+        @media(max-width:768px){.share-buttons{padding:15px;margin:20px 0}.share-btn{width:38px;height:38px;font-size:.85rem}.share-icons{gap:8px}}
+        @media(max-width:480px){.share-btn{width:36px;height:36px;font-size:.8rem}}
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded',function(){
+            const e=document.querySelectorAll('.share-btn[data-share]'),
+                  t=encodeURIComponent(window.location.href),
+                  n=encodeURIComponent(document.querySelector('h1')?.textContent||document.title||'Check this out'),
+                  o={
+                      twitter:'https://twitter.com/intent/tweet?url='+t+'&text='+n,
+                      facebook:'https://www.facebook.com/sharer/sharer.php?u='+t,
+                      linkedin:'https://www.linkedin.com/sharing/share-offsite/?url='+t,
+                      whatsapp:'https://api.whatsapp.com/send?text='+n+'%20-%20'+t,
+                      telegram:'https://t.me/share/url?url='+t+'&text='+n,
+                      email:'mailto:?subject='+n+'&body=Check out this article: '+t,
+                      copy:'copy'
+                  };
+            
+            e.forEach(function(btn){
+                btn.addEventListener('click',function(e){
+                    e.preventDefault();
+                    const r=this.dataset.share;
+                    if(r==='copy'){
+                        const url=decodeURIComponent(t);
+                        navigator.clipboard.writeText(url).then(function(){
+                            showToast('Link copied!');
+                        }).catch(function(){
+                            const input=document.createElement('textarea');
+                            input.value=url;
+                            document.body.appendChild(input);
+                            input.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(input);
+                            showToast('Link copied!');
+                        });
+                    } else {
+                        window.open(o[r],'_blank','width=600,height=500');
+                    }
+                });
+            });
+            
+            function showToast(msg){
+                let toast=document.querySelector('.copy-toast');
+                if(!toast){
+                    toast=document.createElement('div');
+                    toast.className='copy-toast';
+                    document.body.appendChild(toast);
+                }
+                toast.textContent=msg;
+                toast.classList.add('show');
+                setTimeout(function(){
+                    toast.classList.remove('show');
+                },3000);
+            }
+            
+            // Sidebar toggle for mobile
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.admin-sidebar');
+            if(sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                });
+            }
+        });
+    </script>
+</body>
 </html>
-
-
-
-
