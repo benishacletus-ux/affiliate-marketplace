@@ -21,7 +21,6 @@
             </div>
             
             <nav class="admin-nav">
-                <!-- ✅ FIXED: Added /admin-panel/ prefix to all links -->
                 <a href="{{ url_for('admin_dashboard') }}" class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
@@ -46,10 +45,11 @@
                     <i class="fas fa-star"></i>
                     <span>Reviews</span>
                 </a>
-                <a href="{{ url_for('admin_orders') }}" class="nav-item {% if request.endpoint == 'admin_orders' %}active{% endif %}">
+                <!-- Orders link removed - coming soon -->
+                <!-- <a href="{{ url_for('admin_orders') }}" class="nav-item">
                     <i class="fas fa-shopping-cart"></i>
                     <span>Orders</span>
-                </a>
+                </a> -->
                 <a href="{{ url_for('admin_settings') }}" class="nav-item {% if request.endpoint == 'admin_settings' %}active{% endif %}">
                     <i class="fas fa-cog"></i>
                     <span>Settings</span>
@@ -138,7 +138,7 @@
         /* Sidebar active state */
         .nav-item.active {
             background: rgba(255,255,255,0.15);
-            border-left: 3px solid #fff;
+            border-left: 3px solid #f5a623;
         }
         
         @media(max-width:768px){.share-buttons{padding:15px;margin:20px 0}.share-btn{width:38px;height:38px;font-size:.85rem}.share-icons{gap:8px}}
@@ -147,56 +147,6 @@
     
     <script>
         document.addEventListener('DOMContentLoaded',function(){
-            const e=document.querySelectorAll('.share-btn[data-share]'),
-                  t=encodeURIComponent(window.location.href),
-                  n=encodeURIComponent(document.querySelector('h1')?.textContent||document.title||'Check this out'),
-                  o={
-                      twitter:'https://twitter.com/intent/tweet?url='+t+'&text='+n,
-                      facebook:'https://www.facebook.com/sharer/sharer.php?u='+t,
-                      linkedin:'https://www.linkedin.com/sharing/share-offsite/?url='+t,
-                      whatsapp:'https://api.whatsapp.com/send?text='+n+'%20-%20'+t,
-                      telegram:'https://t.me/share/url?url='+t+'&text='+n,
-                      email:'mailto:?subject='+n+'&body=Check out this article: '+t,
-                      copy:'copy'
-                  };
-            
-            e.forEach(function(btn){
-                btn.addEventListener('click',function(e){
-                    e.preventDefault();
-                    const r=this.dataset.share;
-                    if(r==='copy'){
-                        const url=decodeURIComponent(t);
-                        navigator.clipboard.writeText(url).then(function(){
-                            showToast('Link copied!');
-                        }).catch(function(){
-                            const input=document.createElement('textarea');
-                            input.value=url;
-                            document.body.appendChild(input);
-                            input.select();
-                            document.execCommand('copy');
-                            document.body.removeChild(input);
-                            showToast('Link copied!');
-                        });
-                    } else {
-                        window.open(o[r],'_blank','width=600,height=500');
-                    }
-                });
-            });
-            
-            function showToast(msg){
-                let toast=document.querySelector('.copy-toast');
-                if(!toast){
-                    toast=document.createElement('div');
-                    toast.className='copy-toast';
-                    document.body.appendChild(toast);
-                }
-                toast.textContent=msg;
-                toast.classList.add('show');
-                setTimeout(function(){
-                    toast.classList.remove('show');
-                },3000);
-            }
-            
             // Sidebar toggle for mobile
             const sidebarToggle = document.getElementById('sidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
@@ -204,6 +154,58 @@
                 sidebarToggle.addEventListener('click', function() {
                     sidebar.classList.toggle('open');
                 });
+            }
+            
+            // Share buttons
+            const shareBtns = document.querySelectorAll('.share-btn[data-share]');
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.querySelector('h1')?.textContent || document.title || 'Check this out');
+            
+            const shareUrls = {
+                twitter: 'https://twitter.com/intent/tweet?url=' + url + '&text=' + title,
+                facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + url,
+                linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + url,
+                whatsapp: 'https://api.whatsapp.com/send?text=' + title + '%20-%20' + url,
+                telegram: 'https://t.me/share/url?url=' + url + '&text=' + title,
+                email: 'mailto:?subject=' + title + '&body=Check out this article: ' + url,
+                copy: 'copy'
+            };
+            
+            shareBtns.forEach(function(btn){
+                btn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    const type = this.dataset.share;
+                    if(type === 'copy'){
+                        const copyUrl = decodeURIComponent(url);
+                        navigator.clipboard.writeText(copyUrl).then(function(){
+                            showToast('Link copied!');
+                        }).catch(function(){
+                            const input = document.createElement('textarea');
+                            input.value = copyUrl;
+                            document.body.appendChild(input);
+                            input.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(input);
+                            showToast('Link copied!');
+                        });
+                    } else {
+                        window.open(shareUrls[type], '_blank', 'width=600,height=500');
+                    }
+                });
+            });
+            
+            function showToast(msg){
+                let toast = document.querySelector('.copy-toast');
+                if(!toast){
+                    toast = document.createElement('div');
+                    toast.className = 'copy-toast';
+                    document.body.appendChild(toast);
+                }
+                toast.textContent = msg;
+                toast.classList.add('show');
+                setTimeout(function(){
+                    toast.classList.remove('show');
+                }, 3000);
             }
         });
     </script>
