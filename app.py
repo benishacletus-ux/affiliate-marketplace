@@ -13,8 +13,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
-# app.py
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///affiliate.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -83,132 +82,150 @@ def format_datetime(value, format='%B %d, %Y'):
 @app.context_processor
 def inject_categories():
     """Make categories and request available in all templates"""
-    categories = Category.query.order_by(Category.display_order).all()
-    return dict(all_categories=categories, request=request)
+    try:
+        categories = Category.query.order_by(Category.display_order).all()
+        return dict(all_categories=categories, request=request)
+    except Exception as e:
+        print(f"⚠️ Error loading categories: {e}")
+        return dict(all_categories=[], request=request)
+
+# ==================== DATABASE INITIALIZATION ====================
+
+def init_database():
+    """Initialize database tables and create default data"""
+    with app.app_context():
+        try:
+            # Create all tables
+            db.create_all()
+            print("✅ Database tables created successfully!")
+            
+            # Create admin user if not exists
+            admin = User.query.filter_by(username='admin').first()
+            if not admin:
+                admin = User(username='admin', email='admin@affiliate.com', is_admin=True)
+                admin.set_password('admin123')
+                db.session.add(admin)
+                db.session.commit()
+                print("✅ Admin user created: admin / admin123")
+            else:
+                print("✅ Admin user already exists")
+            
+            # Create default categories if none exist
+            if Category.query.count() == 0:
+                categories = [
+                    ('Gadgets & Tech', 'gadgets-tech', 'fas fa-microchip', 'Latest electronics, headphones, laptops & smart devices', 1),
+                    ('Wellness & Self-care', 'wellness-selfcare', 'fas fa-heartbeat', 'Self-care tools, meditation aids, wellness gadgets', 2),
+                    ('Home & Living', 'home-living', 'fas fa-home', 'Cozy decor, kitchen essentials, smart home devices', 3),
+                    ('Photography', 'photography', 'fas fa-camera', 'Cameras, lenses, accessories for creators', 4),
+                    ('Fashion & Accessories', 'fashion-accessories', 'fas fa-tshirt', 'Streetwear, jewelry, bags & style essentials', 5),
+                    ('Fitness Gear', 'fitness-gear', 'fas fa-dumbbell', 'Equipment, smart trackers, activewear', 6),
+                    ('Digital Courses', 'digital-courses', 'fas fa-graduation-cap', 'Online learning, guides & templates', 7),
+                    ('Art & Stationery', 'art-stationery', 'fas fa-paintbrush', 'Journals, pens, art supplies, planners', 8),
+                ]
+                for name, slug, icon, desc, order in categories:
+                    cat = Category(name=name, slug=slug, icon=icon, description=desc, display_order=order)
+                    db.session.add(cat)
+                db.session.commit()
+                print(f"✅ Created {len(categories)} categories")
+            
+            return True
+        except Exception as e:
+            print(f"❌ Error initializing database: {e}")
+            return False
 
 # ==================== SAMPLE DATA INITIALIZATION ====================
 
 def init_sample_data():
-    """Create sample categories, products, blog posts and reviews"""
-    
-    # Check if already populated
-    if Category.query.first():
-        return
-    
-    print("Creating sample data...")
-    
-    # Create categories
-    categories_data = [
-        ('Gadgets & Tech', 'gadgets-tech', 'fas fa-microchip', 'Latest electronics, headphones, laptops & smart devices', 1),
-        ('Wellness & Self-care', 'wellness-selfcare', 'fas fa-heartbeat', 'Self-care tools, meditation aids, wellness gadgets', 2),
-        ('Home & Living', 'home-living', 'fas fa-home', 'Cozy decor, kitchen essentials, smart home devices', 3),
-        ('Photography', 'photography', 'fas fa-camera', 'Cameras, lenses, accessories for creators', 4),
-        ('Fashion & Accessories', 'fashion-accessories', 'fas fa-tshirt', 'Streetwear, jewelry, bags & style essentials', 5),
-        ('Fitness Gear', 'fitness-gear', 'fas fa-dumbbell', 'Equipment, smart trackers, activewear', 6),
-        ('Digital Courses', 'digital-courses', 'fas fa-graduation-cap', 'Online learning, guides & templates', 7),
-        ('Art & Stationery', 'art-stationery', 'fas fa-paintbrush', 'Journals, pens, art supplies, planners', 8),
-    ]
-    
-    categories = []
-    for name, slug, icon, desc, order in categories_data:
-        cat = Category(name=name, slug=slug, icon=icon, description=desc, display_order=order)
-        db.session.add(cat)
-        categories.append(cat)
-    db.session.commit()
-    
-    # Create sample products
-    products_by_category = {
-        'gadgets-tech': [
-            ('Sony WH-1000XM5 Headphones', 'sony-wh1000xm5', 'Premium noise-cancelling headphones with exceptional sound quality.', 348, 399, 'https://amzn.to/sample1', 'fas fa-headphones', 4.9, 1240, True, True, 15),
-            ('Apple MacBook Air M2', 'macbook-air-m2', 'Supercharged by the next-generation M2 chip.', 1099, 1299, 'https://amzn.to/sample2', 'fas fa-laptop', 4.8, 856, True, True, 12),
-            ('AirPods Pro 2', 'airpods-pro-2', 'Active noise cancellation and spatial audio.', 199, 249, 'https://amzn.to/sample3', 'fas fa-headphones', 4.9, 3420, True, False, 10),
-            ('Samsung Galaxy Watch 6', 'galaxy-watch-6', 'Advanced health tracking and fitness monitoring.', 289, 349, 'https://amzn.to/sample4', 'fas fa-clock', 4.7, 892, True, False, 12),
-            ('Logitech MX Master 3S', 'mx-master-3s', 'Ultra-fast scrolling and ergonomic design.', 89, 109, 'https://amzn.to/sample5', 'fas fa-mouse', 4.8, 2100, False, True, 8),
-        ],
-        'wellness-selfcare': [
-            ('Aromatherapy Diffuser', 'aroma-diffuser', 'Ultrasonic essential oil diffuser.', 29.99, 49.99, 'https://amzn.to/sample6', 'fas fa-spa', 4.7, 340, True, True, 12),
-            ('Meditation Cushion', 'meditation-cushion', 'Zafu meditation pillow.', 45, 69, 'https://amzn.to/sample7', 'fas fa-lotus', 4.8, 230, True, False, 10),
-            ('Weighted Blanket', 'weighted-blanket', '15lbs glass bead weighted blanket.', 79, 129, 'https://amzn.to/sample8', 'fas fa-bed', 4.6, 890, True, True, 8),
-        ],
-    }
-    
-    for cat in categories:
-        cat_products = products_by_category.get(cat.slug, [])
-        for name, slug, desc, price, orig_price, link, icon, rating, reviews, trending, featured, comm in cat_products:
-            product = Product(
-                name=name, slug=slug, description=desc, price=price, original_price=orig_price,
-                affiliate_link=link, image_icon=icon, rating=rating, reviews_count=reviews,
-                category_id=cat.id, is_trending=trending, is_featured=featured, commission_rate=comm
+    """Create sample products, blog posts and reviews"""
+    with app.app_context():
+        # Check if products already exist
+        if Product.query.first():
+            return
+        
+        print("Creating sample data...")
+        
+        # Get categories
+        categories = Category.query.all()
+        if not categories:
+            print("⚠️ No categories found, skipping sample data")
+            return
+        
+        # Create sample products
+        products_by_category = {
+            'gadgets-tech': [
+                ('Sony WH-1000XM5 Headphones', 'sony-wh1000xm5', 'Premium noise-cancelling headphones with exceptional sound quality.', 348, 399, 'https://amzn.to/sample1', 'fas fa-headphones', 4.9, 1240, True, True, 15),
+                ('Apple MacBook Air M2', 'macbook-air-m2', 'Supercharged by the next-generation M2 chip.', 1099, 1299, 'https://amzn.to/sample2', 'fas fa-laptop', 4.8, 856, True, True, 12),
+                ('AirPods Pro 2', 'airpods-pro-2', 'Active noise cancellation and spatial audio.', 199, 249, 'https://amzn.to/sample3', 'fas fa-headphones', 4.9, 3420, True, False, 10),
+                ('Samsung Galaxy Watch 6', 'galaxy-watch-6', 'Advanced health tracking and fitness monitoring.', 289, 349, 'https://amzn.to/sample4', 'fas fa-clock', 4.7, 892, True, False, 12),
+                ('Logitech MX Master 3S', 'mx-master-3s', 'Ultra-fast scrolling and ergonomic design.', 89, 109, 'https://amzn.to/sample5', 'fas fa-mouse', 4.8, 2100, False, True, 8),
+            ],
+            'wellness-selfcare': [
+                ('Aromatherapy Diffuser', 'aroma-diffuser', 'Ultrasonic essential oil diffuser.', 29.99, 49.99, 'https://amzn.to/sample6', 'fas fa-spa', 4.7, 340, True, True, 12),
+                ('Meditation Cushion', 'meditation-cushion', 'Zafu meditation pillow.', 45, 69, 'https://amzn.to/sample7', 'fas fa-lotus', 4.8, 230, True, False, 10),
+                ('Weighted Blanket', 'weighted-blanket', '15lbs glass bead weighted blanket.', 79, 129, 'https://amzn.to/sample8', 'fas fa-bed', 4.6, 890, True, True, 8),
+            ],
+        }
+        
+        for cat in categories:
+            cat_products = products_by_category.get(cat.slug, [])
+            for name, slug, desc, price, orig_price, link, icon, rating, reviews, trending, featured, comm in cat_products:
+                product = Product(
+                    name=name, slug=slug, description=desc, price=price, original_price=orig_price,
+                    affiliate_link=link, image_icon=icon, rating=rating, reviews_count=reviews,
+                    category_id=cat.id, is_trending=trending, is_featured=featured, commission_rate=comm
+                )
+                db.session.add(product)
+        db.session.commit()
+        print("✅ Sample products created")
+        
+        # Create blog posts
+        blog_posts = [
+            ('Why Pastel Niches Convert Better in 2026', 'why-pastel-niches-convert', 'Learn how aesthetic affiliate marketing boosts trust and sales.', 'Strategy', 'Sarah Johnson', 'fas fa-chart-line'),
+            ('10 High-Ticket Affiliate Programs', 'high-ticket-affiliate-programs', 'Discover the most profitable affiliate programs.', 'Tips & Tricks', 'Mike Chen', 'fas fa-dollar-sign'),
+            ('SEO Secrets for Product Reviews', 'seo-product-reviews', 'A complete blueprint to rank your affiliate reviews.', 'SEO', 'Emma Watson', 'fas fa-magnifying-glass'),
+            ('How to Build an Email List', 'build-email-list', 'Learn effective strategies to grow your email subscriber list.', 'Email Marketing', 'David Brown', 'fas fa-envelope'),
+            ('Affiliate Marketing for Beginners', 'affiliate-beginners', 'Step by step guide to start your affiliate marketing journey.', 'Beginners', 'Lisa Wong', 'fas fa-rocket'),
+        ]
+        
+        for title, slug, excerpt, category, author, icon in blog_posts:
+            content = f"""
+            <h2>Introduction</h2>
+            <p>{excerpt}</p>
+            <h2>Key Takeaways</h2>
+            <ul>
+                <li>Understanding the current market trends</li>
+                <li>Actionable strategies for immediate implementation</li>
+                <li>Expert tips to maximize your results</li>
+            </ul>
+            <h2>Deep Dive</h2>
+            <p>This comprehensive guide covers everything you need to know about {title.lower()}.</p>
+            <h2>Conclusion</h2>
+            <p>Implement these strategies today and watch your affiliate income grow!</p>
+            """
+            post = BlogPost(
+                title=title, slug=slug, excerpt=excerpt, content=content,
+                category=category, author=author, image_icon=icon,
+                tags='affiliate, marketing, tips, strategy',
+                is_published=True
             )
-            db.session.add(product)
-    db.session.commit()
-    
-    # Create blog posts with images
-    blog_posts = [
-        ('Why Pastel Niches Convert Better in 2026', 'why-pastel-niches-convert', 'Learn how aesthetic affiliate marketing boosts trust and sales.', 'Strategy', 'Sarah Johnson', 'fas fa-chart-line', 'pastel-niches.jpg'),
-        ('10 High-Ticket Affiliate Programs', 'high-ticket-affiliate-programs', 'Discover the most profitable affiliate programs.', 'Tips & Tricks', 'Mike Chen', 'fas fa-dollar-sign', 'high-ticket.jpg'),
-        ('SEO Secrets for Product Reviews', 'seo-product-reviews', 'A complete blueprint to rank your affiliate reviews.', 'SEO', 'Emma Watson', 'fas fa-magnifying-glass', 'seo-secrets.jpg'),
-        ('How to Build an Email List', 'build-email-list', 'Learn effective strategies to grow your email subscriber list.', 'Email Marketing', 'David Brown', 'fas fa-envelope', 'email-list.jpg'),
-        ('Affiliate Marketing for Beginners', 'affiliate-beginners', 'Step by step guide to start your affiliate marketing journey.', 'Beginners', 'Lisa Wong', 'fas fa-rocket', 'affiliate-beginners.jpg'),
-    ]
-    
-    for title, slug, excerpt, category, author, icon, img in blog_posts:
-        content = f"""
-        <h2>Introduction</h2>
-        <p>{excerpt}</p>
-        <h2>Key Takeaways</h2>
-        <ul>
-            <li>Understanding the current market trends</li>
-            <li>Actionable strategies for immediate implementation</li>
-            <li>Expert tips to maximize your results</li>
-        </ul>
-        <h2>Deep Dive</h2>
-        <p>This comprehensive guide covers everything you need to know about {title.lower()}.</p>
-        <h2>Conclusion</h2>
-        <p>Implement these strategies today and watch your affiliate income grow!</p>
-        """
-        post = BlogPost(
-            title=title, slug=slug, excerpt=excerpt, content=content,
-            category=category, author=author, image_icon=icon,
-            image_file=img,  # Sample image filename
-            tags='affiliate, marketing, tips, strategy'
-        )
-        db.session.add(post)
-    db.session.commit()
-    
-    # Create sample reviews
-    reviews_data = [
-        ('Jessica Miller', 'JM', 5, 'Absolutely love these headphones! The noise cancellation is incredible.', 1),
-        ('David Kim', 'DK', 4, 'Great product but a bit pricey. Still worth it for the quality.', 2),
-        ('Sarah Williams', 'SW', 5, 'Life-changing! The meditation cushion improved my daily practice significantly.', 3),
-        ('Michael Brown', 'MB', 5, 'The MacBook Air M2 is a beast! Super fast and battery lasts all day.', 2),
-        ('Emily Davis', 'ED', 4, 'Very comfortable weighted blanket. Helps me sleep better at night.', 3),
-        ('Chris Wilson', 'CW', 5, 'Best investment I made this year. Highly recommend!', 1),
-    ]
-    
-    for name, avatar, rating, comment, prod_id in reviews_data:
-        review = Review(user_name=name, user_avatar=avatar, rating=rating, comment=comment, product_id=prod_id, is_approved=True)
-        db.session.add(review)
-    db.session.commit()
-    
-    # Create admin user
-    admin = User(username='admin', email='admin@affiliate.com', is_admin=True)
-    admin.set_password('admin123')
-    db.session.add(admin)
-    
-    db.session.commit()
-    
-    print("=" * 50)
-    print("✅ Sample data created successfully!")
-    print("=" * 50)
-    print("🔐 ADMIN ACCESS ONLY:")
-    print("   Admin Login URL: http://127.0.0.1:5000/admin-panel/login")
-    print("   Username: admin")
-    print("   Password: admin123")
-    print("-" * 50)
-    print("👥 CUSTOMER ACCESS (No Login Required):")
-    print("   Customer Site URL: http://127.0.0.1:5000/")
-    print("=" * 50)
+            db.session.add(post)
+        db.session.commit()
+        print("✅ Sample blog posts created")
+        
+        # Create sample reviews
+        reviews_data = [
+            ('Jessica Miller', 'JM', 5, 'Absolutely love these headphones! The noise cancellation is incredible.', 1),
+            ('David Kim', 'DK', 4, 'Great product but a bit pricey. Still worth it for the quality.', 2),
+            ('Sarah Williams', 'SW', 5, 'Life-changing! The meditation cushion improved my daily practice significantly.', 3),
+        ]
+        
+        for name, avatar, rating, comment, prod_id in reviews_data:
+            product = Product.query.get(prod_id)
+            if product:
+                review = Review(user_name=name, user_avatar=avatar, rating=rating, comment=comment, product_id=prod_id, is_approved=True)
+                db.session.add(review)
+        db.session.commit()
+        print("✅ Sample reviews created")
 
 # ==================== FRONTEND ROUTES ====================
 
@@ -914,7 +931,9 @@ def internal_error(error):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        # Initialize database
+        init_database()
+        # Create sample data
         init_sample_data()
     
     print("=" * 50)
