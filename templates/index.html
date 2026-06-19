@@ -4,8 +4,6 @@
 <!-- Hero Banner - White Theme with Black Accents -->
 <div class="hero">
     <div class="hero-content">
-        
-
         <h1>Discover the <span class="highlight">best products</span> before you buy</h1>
 
         <p>Explore carefully researched product reviews, expert recommendations, and exclusive deals to help you find
@@ -112,7 +110,15 @@
 <div class="blog-grid desktop-only">
     {% for post in latest_blog %}
     <a href="{{ url_for('blog_post', slug=post.slug) }}" class="blog-card">
-        <div class="blog-img"><i class="{{ post.image_icon }}"></i></div>
+        <div class="blog-img">
+            {% if post.image_file %}
+                <img src="{{ url_for('static', filename='uploads/blog/' + post.image_file) }}" alt="{{ post.title }}" class="blog-image">
+            {% elif post.image_url %}
+                <img src="{{ post.image_url }}" alt="{{ post.title }}" class="blog-image">
+            {% else %}
+                <i class="{{ post.image_icon or 'fas fa-newspaper' }}"></i>
+            {% endif %}
+        </div>
         <div class="blog-content">
             <div class="blog-category">{{ post.category }}</div>
             <h4>{{ post.title[:40] }}</h4>
@@ -128,7 +134,15 @@
     <div class="blog-scroll-track">
         {% for post in latest_blog %}
         <a href="{{ url_for('blog_post', slug=post.slug) }}" class="blog-card-horizontal">
-            <div class="blog-img-horizontal"><i class="{{ post.image_icon }}"></i></div>
+            <div class="blog-img-horizontal">
+                {% if post.image_file %}
+                    <img src="{{ url_for('static', filename='uploads/blog/' + post.image_file) }}" alt="{{ post.title }}" class="blog-image-horizontal">
+                {% elif post.image_url %}
+                    <img src="{{ post.image_url }}" alt="{{ post.title }}" class="blog-image-horizontal">
+                {% else %}
+                    <i class="{{ post.image_icon or 'fas fa-newspaper' }}"></i>
+                {% endif %}
+            </div>
             <div class="blog-content-horizontal">
                 <div class="blog-category-horizontal">{{ post.category }}</div>
                 <h4>{{ post.title[:35] }}</h4>
@@ -421,6 +435,7 @@
         color: #888;
     }
 
+    /* Blog Grid - FIXED */
     .blog-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -436,6 +451,8 @@
         text-decoration: none;
         transition: all 0.25s ease;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        display: flex;
+        flex-direction: column;
     }
 
     .blog-card:hover {
@@ -445,12 +462,19 @@
     }
 
     .blog-img {
-        height: 180px;
+        height: 200px;
         background: #f8f8f8;
         display: flex;
         align-items: center;
         justify-content: center;
         border-bottom: 1px solid #e0e0e0;
+        overflow: hidden;
+    }
+
+    .blog-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .blog-img i {
@@ -460,6 +484,9 @@
 
     .blog-content {
         padding: 24px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
 
     .blog-category {
@@ -482,6 +509,7 @@
         color: #666;
         margin-bottom: 16px;
         line-height: 1.5;
+        flex: 1;
     }
 
     .read-more {
@@ -491,6 +519,105 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        margin-top: auto;
+    }
+
+    /* Blog Horizontal Scroll - FIXED */
+    .blog-scroll-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        margin: 0 -20px;
+        padding: 0 20px 20px;
+        display: none;
+    }
+
+    .blog-scroll-track {
+        display: flex;
+        gap: 20px;
+        width: fit-content;
+    }
+
+    .blog-card-horizontal {
+        flex-shrink: 0;
+        width: 270px;
+        scroll-snap-align: start;
+        background: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        overflow: hidden;
+        text-decoration: none;
+        transition: 0.2s;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .blog-card-horizontal:hover {
+        transform: translateY(-3px);
+        border-color: #1a1a1a;
+    }
+
+    .blog-img-horizontal {
+        height: 150px;
+        background: #f8f8f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid #e0e0e0;
+        overflow: hidden;
+    }
+
+    .blog-image-horizontal {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .blog-img-horizontal i {
+        font-size: 2.2rem;
+        color: #1a1a1a;
+    }
+
+    .blog-content-horizontal {
+        padding: 14px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .blog-category-horizontal {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #888888;
+        margin-bottom: 6px;
+    }
+
+    .blog-content-horizontal h4 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #1a1a1a;
+        line-height: 1.3;
+    }
+
+    .blog-content-horizontal p {
+        font-size: 0.7rem;
+        color: #666666;
+        margin-bottom: 10px;
+        line-height: 1.4;
+        flex: 1;
+    }
+
+    .read-more-horizontal {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: auto;
     }
 
     .reviews-grid {
@@ -763,90 +890,6 @@
         color: #888888;
     }
 
-    /* Blog Horizontal Scroll */
-    .blog-scroll-wrapper {
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
-        margin: 0 -20px;
-        padding: 0 20px 20px;
-        display: none;
-    }
-
-    .blog-scroll-track {
-        display: flex;
-        gap: 20px;
-        width: fit-content;
-    }
-
-    .blog-card-horizontal {
-        flex-shrink: 0;
-        width: 270px;
-        scroll-snap-align: start;
-        background: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 20px;
-        overflow: hidden;
-        text-decoration: none;
-        transition: 0.2s;
-    }
-
-    .blog-card-horizontal:hover {
-        transform: translateY(-3px);
-        border-color: #1a1a1a;
-    }
-
-    .blog-img-horizontal {
-        height: 130px;
-        background: #f8f8f8;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-bottom: 1px solid #e0e0e0;
-    }
-
-    .blog-img-horizontal i {
-        font-size: 2.2rem;
-        color: #1a1a1a;
-    }
-
-    .blog-content-horizontal {
-        padding: 14px;
-    }
-
-    .blog-category-horizontal {
-        font-size: 0.6rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #888888;
-        margin-bottom: 6px;
-    }
-
-    .blog-content-horizontal h4 {
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 6px;
-        color: #1a1a1a;
-        line-height: 1.3;
-    }
-
-    .blog-content-horizontal p {
-        font-size: 0.7rem;
-        color: #666666;
-        margin-bottom: 10px;
-        line-height: 1.4;
-    }
-
-    .read-more-horizontal {
-        font-size: 0.65rem;
-        font-weight: 600;
-        color: #1a1a1a;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-
     /* Reviews Auto-Scroll Carousel */
     .reviews-carousel-container {
         position: relative;
@@ -1029,14 +1072,65 @@
             width: 230px;
         }
 
+        .blog-img-horizontal {
+            height: 120px;
+        }
+
         .review-card-auto {
             width: 240px;
         }
     }
 </style>
+
+<script>
+    // Trending Products - Drag to Scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.querySelector('.trending-container');
+        if (container) {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            container.addEventListener('mousedown', (e) => {
+                isDown = true;
+                container.style.cursor = 'grabbing';
+                startX = e.pageX - container.offsetLeft;
+                scrollLeft = container.scrollLeft;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                isDown = false;
+                container.style.cursor = 'grab';
+            });
+
+            container.addEventListener('mouseup', () => {
+                isDown = false;
+                container.style.cursor = 'grab';
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const walk = (x - startX) * 2;
+                container.scrollLeft = scrollLeft - walk;
+            });
+
+            // Touch support
+            let touchStartX = 0;
+            let touchScrollLeft = 0;
+
+            container.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].pageX - container.offsetLeft;
+                touchScrollLeft = container.scrollLeft;
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                const x = e.touches[0].pageX - container.offsetLeft;
+                const walk = (x - touchStartX) * 2;
+                container.scrollLeft = touchScrollLeft - walk;
+            });
+        }
+    });
+</script>
 {% endblock %}
-
-
-
-
-
