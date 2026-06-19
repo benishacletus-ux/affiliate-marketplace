@@ -60,7 +60,7 @@
         <div class="post-tags">
             <span class="tags-label"><i class="fas fa-tags"></i> Tags:</span>
             {% for tag in post.get_tags_list() %}
-                <a href="{{ url_for('blog_by_tag', tag=tag) }}" class="tag-link">#{{ tag }}</a>
+                <a href="{{ url_for('blog') }}?tag={{ tag }}" class="tag-link">#{{ tag }}</a>
             {% endfor %}
         </div>
         {% endif %}
